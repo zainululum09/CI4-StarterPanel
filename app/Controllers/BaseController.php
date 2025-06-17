@@ -2,13 +2,13 @@
 
 namespace App\Controllers;
 
+use App\Models\ApplicationModel;
 use CodeIgniter\Controller;
+use CodeIgniter\HTTP\CLIRequest;
+use CodeIgniter\HTTP\IncomingRequest;
 use CodeIgniter\HTTP\RequestInterface;
 use CodeIgniter\HTTP\ResponseInterface;
 use Psr\Log\LoggerInterface;
-use App\Models\UserModel;
-use App\Models\MenuModel;
-
 
 /**
  * Class BaseController
@@ -20,60 +20,57 @@ use App\Models\MenuModel;
  *
  * For security be sure to declare any new methods as protected or private.
  */
-
-class BaseController extends Controller
+abstract class BaseController extends Controller
 {
-	/**
-	 * An array of helpers to be loaded automatically upon
-	 * class instantiation. These helpers will be available
-	 * to all other controllers that extend BaseController.
-	 *
-	 * @var array
-	 */
-	protected $helpers 	= ['cookie', 'date', 'security', 'menu', 'useraccess'];
-	/**
-	 * Constructor.
-	 *
-	 * @param RequestInterface  $request
-	 * @param ResponseInterface $response
-	 * @param LoggerInterface   $logger
-	 */
+    /**
+     * Instance of the main Request object.
+     *
+     * @var CLIRequest|IncomingRequest
+     */
+    protected $request;
 
+    /**
+     * An array of helpers to be loaded automatically upon
+     * class instantiation. These helpers will be available
+     * to all other controllers that extend BaseController.
+     *
+     * @var list<string>
+     */
+    protected $helpers = ['cookie', 'date', 'security', 'menu', 'useraccess'];
 
-	protected $data 	= [];
-	protected $userModel;
-	protected $session;
-	protected $segment;
-	protected $db;
-	protected $validation;
-	protected $encrypter;
-	protected $menuModel;
-	public function initController(RequestInterface $request, ResponseInterface $response, LoggerInterface $logger)
-	{
-		// Do Not Edit This Line
-		parent::initController($request, $response, $logger);
-		//--------------------------------------------------------------------
-		// Preload any models, libraries, etc, here.
-		//--------------------------------------------------------------------
-		$this->session 		= \Config\Services::session();
-		$this->segment 	  	= \Config\Services::request();
-		$this->db         	= \Config\Database::connect();
-		$this->validation 	= \Config\Services::validation();
-		$this->encrypter 	= \Config\Services::encrypter();
-		$this->userModel  	= new UserModel();
-		$this->menuModel  	= new MenuModel();
-		$user 				= $this->userModel->getUser(username: session()->get('username'));
-		$segment 			= $this->request->uri->getSegment(1);
-		if ($segment) {
-			$subsegment 	= $this->request->uri->getSegment(2);
-		} else {
-			$subsegment 	= '';
-		}
-		$this->data			= [
-			'segment' 		=> $segment,
-			'subsegment' 	=> $subsegment,
-			'user' 			=> $user,
-			'MenuCategory' 	=> $this->userModel->getAccessMenuCategory(session()->get('role'))
-		];
-	}
+    /**
+     * Be sure to declare properties for any property fetch you initialized.
+     * The creation of dynamic property is deprecated in PHP 8.2.
+     */
+    protected $session, $segment, $validation, $encrypter, $ApplicationModel, $data = [];
+    /**
+     * @return void
+     */
+    public function initController(RequestInterface $request, ResponseInterface $response, LoggerInterface $logger)
+    {
+        // Do Not Edit This Line
+        parent::initController($request, $response, $logger);
+
+        // Preload any models, libraries, etc, here.
+
+        $this->session          = service('session');
+        $this->segment          = service('uri');
+        $this->validation       = \Config\Services::validation();
+        $this->encrypter        = \Config\Services::encrypter();
+        $this->ApplicationModel = new ApplicationModel();
+
+        $user    = $this->ApplicationModel->getUser(username: session()->get('username'));
+        $segment = $this->segment->getSegment(1);
+        if ($segment) {
+            $subsegment = $this->segment->getSegment(2);
+        } else {
+            $subsegment = '';
+        }
+        $this->data = [
+            'segment'        => $segment,
+            'subsegment'     => $subsegment,
+            'user'           => $user,
+            'MenuCategory'   => $this->ApplicationModel->getAccessMenuCategory(session()->get('role'))
+        ];
+    }
 }

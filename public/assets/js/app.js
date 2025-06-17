@@ -1,4 +1,3 @@
-/*! For license information please see app.js.LICENSE.txt */
 !(function (t) {
   var e = {};
   function i(n) {

@@ -1,7 +1,7 @@
 <nav id="sidebar" class="sidebar js-sidebar">
     <div class="sidebar-content js-simplebar">
         <a class="sidebar-brand" href="<?= base_url(); ?> ">
-            <span class="align-middle">CI4 - Starter Panel</span>
+            <span class="align-middle"><i>Starter Panel</i></span>
         </a>
         <ul class="sidebar-nav">
             <?php foreach ($MenuCategory as $mCategory) : ?>

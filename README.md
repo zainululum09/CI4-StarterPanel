@@ -1,36 +1,45 @@
-# CodeIgniter 4 Admin Panel Starter
+# CodeIgniter 4 Starter Panel
 
-## Installation & updates
+CodeIgniter is a PHP full-stack web framework that is light, fast, flexible and secure.
+More information can be found at the [official site](https://codeigniter.com).
 
-`git clone` or download this source code then run `composer update` whenever there is a new release of the framework.
+This repository is a starter kit for CodeIgniter 4. Using codeigniter version 4.6.1, PHP version 8.4 and bootstrap version 5.
+### Documentation
+
+The [User Guide](https://codeigniter.com/user_guide/) is the primary documentation for CodeIgniter 4.
+
+## Installation
+
+`git clone` or download this source code then run `composer install` whenever there is a new release of the framework.
 
 ## Setup
 
-- Copy `env` to `.env` and tailor for your app, specifically the baseURL and any database settings.
 - Run `php spark db:create` to create a new database schema.
+- Copy `env` to `.env` and tailor for your app, specifically the baseURL and any database settings.
 - Run `php spark migrate` to running database migration
-- Run `php spark db:seed users` to seeding default database user
+- Run `php spark db:seed Users` to seeding default database user
 - Run `php spark key:generate` to create encrypter key
 - Run `php spark serve` to launching the CodeIgniter PHP-Development Server
 
 ## Server Requirements
 
-PHP version 8.0 is required, with the following extensions installed:
-
+PHP version 8.4 is required, with the following extensions installed:
+- curl
+- fileinfo
+- gd
 - [intl](http://php.net/manual/en/intl.requirements.php)
+- [mbstring](http://php.net/manual/en/mbstring.installation.php)
 - [libcurl](http://php.net/manual/en/curl.requirements.php) if you plan to use the HTTP\CURLRequest library
+- [mysqlnd](http://php.net/manual/en/mysqlnd.install.php)
+- openssl
 
 Additionally, make sure that the following extensions are enabled in your PHP:
-
 - json (enabled by default - don't turn it off)
-- [mbstring](http://php.net/manual/en/mbstring.installation.php)
-- [mysqlnd](http://php.net/manual/en/mysqlnd.install.php)
 - xml (enabled by default - don't turn it off)
 
 ## Features
 
 Features on this project:
-
 - Authentication
 - Authorization
 - User Registration
