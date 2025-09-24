@@ -164,6 +164,7 @@
             <div class="row vh-100">
                 <div class="col-sm-10 col-md-8 col-lg-6 col-xl-5 mx-auto d-table h-100">
                     <div class="d-table-cell align-middle">
+                        <?= $this->include('components/alerts'); ?>
 
                         <div class="text-center mt-4">
                             <div class="brand-logo">
@@ -175,24 +176,24 @@
                         <div class="card">
                             <div class="card-body">
                                 <div class="m-sm-4">
-                                    <form>
+                                    <form action="<?= base_url('login'); ?>" method="POST">
                                         <div class="mb-3">
                                             <label class="form-label fw-medium">
                                                 <i class="bi bi-envelope me-2"></i>Email
                                             </label>
-                                            <input class="form-control form-control-lg" type="email" name="email" placeholder="Enter your email" />
+                                            <input class="form-control form-control-lg" type="email" name="inputEmail" placeholder="Enter your email" />
                                         </div>
                                         <div class="mb-3">
                                             <label class="form-label fw-medium">
                                                 <i class="bi bi-lock me-2"></i>Password
                                             </label>
-                                            <input class="form-control form-control-lg" type="password" name="password" placeholder="Enter your password" />
+                                            <input class="form-control form-control-lg" type="password" name="inputPassword" placeholder="Enter your password" />
                                         </div>
                                     
                                         <div class="d-grid gap-2 mt-4">
-                                            <a class="btn btn-lg btn-primary" href="index.html">
+                                            <button type="submit" class="btn btn-lg btn-primary">
                                                 <i class="bi bi-box-arrow-in-right me-2"></i>Sign in
-                                            </a>
+                                            </button>
                                         </div>
                                     </form>
                                 </div>
