@@ -39,3 +39,4 @@ $routes->group('menu-management', static function ($routes) {
     $routes->post('create-submenu', 'Settings::createSubMenu');
 });
 $routes->get('menu','Menu::index');
+$routes->get('tarik-dapo','Tarik_dapo::index');
