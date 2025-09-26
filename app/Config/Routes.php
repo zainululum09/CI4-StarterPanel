@@ -39,4 +39,27 @@ $routes->group('menu-management', static function ($routes) {
     $routes->post('create-submenu', 'Settings::createSubMenu');
 });
 $routes->get('menu','Menu::index');
-$routes->get('tarik-dapo','Tarik_dapo::index');
+
+// Halaman utama
+$routes->get('tarik-dapo', 'Tarik_dapo::index');
+
+// Test koneksi
+$routes->get('tarik-dapo/dapodik/(:segment)', 'Tarik_dapo::callDapodik/$1');
+// Test koneksi
+$routes->get('tarik-dapo/test-connection', 'Tarik_dapo::testConnection');
+
+// Cek data dari API
+$routes->get('tarik-dapo/checkData/(:segment)', 'Tarik_dapo::checkData/$1');
+
+// Simpan data ke database
+$routes->post('tarik-dapo/saveData/(:segment)', 'Tarik_dapo::saveData/$1');
+
+// Hapus data dari database
+$routes->delete('tarik-dapo/delete/(:segment)', 'Tarik_dapo::deleteData/$1');
+
+// Konfigurasi
+$routes->post('tarik-dapo/config/save', 'Tarik_dapo::saveConfig');
+$routes->get('tarik-dapo/config', 'Tarik_dapo::getConfig');
+
+// Statistik
+$routes->get('tarik-dapo/statistics', 'Tarik_dapo::getStatistics');

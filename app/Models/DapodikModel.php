@@ -7,6 +7,7 @@ use CodeIgniter\Model;
 class DapodikModel extends Model
 {
     protected $table = 'config_dapodik';
+    // protected $db;
     protected $primaryKey = 'id';
     protected $allowedFields = ['nama_config', 'api_url', 'api_token', 'npsn', 'aktif'];
     protected $useTimestamps = true;
@@ -45,44 +46,41 @@ class DapodikModel extends Model
     
     public function saveSekolahFromDapodik($data)
     {
+        // Cek input data tunggal
+        if (empty($data['npsn'])) {
+            return ['success' => false, 'message' => 'NPSN data kosong.'];
+        }
+        
         $saved = 0;
         $updated = 0;
-        
-        $this->db->transStart();
-        
+        $now = date('Y-m-d H:i:s');
+        $tableName = 'data_sekolah';
+        $npsn = $data['npsn'];
+
+        $this->db->transStart(); // <<< WAJIB ADA
+
         try {
-            foreach ($data as $row) {
-                $npsn = $row['npsn'] ?? '';
-                if (empty($npsn)) continue;
-                
-                $existing = $this->db->table('sekolah')->where('npsn', $npsn)->get()->getRow();
-                
-                $saveData = [
-                    'npsn' => $npsn,
-                    'nama_sekolah' => $row['nama'] ?? '',
-                    'alamat' => $row['alamat_jalan'] ?? '',
-                    'kode_pos' => $row['kode_pos'] ?? '',
-                    'telepon' => $row['nomor_telepon'] ?? '',
-                    'email' => $row['email'] ?? '',
-                    'website' => $row['website'] ?? '',
-                    'status_sekolah' => $row['status_sekolah'] ?? '',
-                    'bentuk_pendidikan' => $row['bentuk_pendidikan_id'] ?? '',
-                    'kode_wilayah' => $row['kode_wilayah'] ?? '',
-                    'updated_at' => date('Y-m-d H:i:s')
-                ];
-                
-                if ($existing) {
-                    $this->db->table('sekolah')->where('npsn', $npsn)->update($saveData);
-                    $updated++;
-                } else {
-                    $saveData['created_at'] = date('Y-m-d H:i:s');
-                    $this->db->table('sekolah')->insert($saveData);
-                    $saved++;
+            $existing = $this->db->table($tableName)->where('npsn', $npsn)->get()->getRow();
+
+            if ($existing) {
+                // UPDATE
+                if (!$this->db->table($tableName)->where('npsn', $npsn)->update($data)) {
+                    log_message('error', "Gagal UPDATE NPSN {$npsn}. Error DB: " . $this->db->error()['message']);
+                    throw new \Exception('Gagal melakukan update ke database.');
                 }
+                $updated++;
+            } else {
+                // INSERT
+                $data['created_at'] = $now;
+                if (!$this->db->table($tableName)->insert($data)) {
+                    log_message('error', "Gagal INSERT NPSN {$npsn}. Error DB: " . $this->db->error()['message']);
+                    throw new \Exception('Gagal memasukkan data baru ke database.');
+                }
+                $saved++;
             }
             
-            $this->db->transComplete();
-            
+            $this->db->transComplete(); // <<< WAJIB ADA
+
             if ($this->db->transStatus() === false) {
                 throw new \Exception('Transaksi database gagal');
             }
@@ -93,9 +91,10 @@ class DapodikModel extends Model
                 'updated' => $updated,
                 'total' => $saved + $updated
             ];
-            
+
         } catch (\Exception $e) {
-            $this->db->transRollback();
+            $this->db->transRollback(); // <<< WAJIB ADA JIKA GAGAL
+            log_message('alert', 'EXCEPTION SAAT SAVING: ' . $e->getMessage());
             return [
                 'success' => false,
                 'message' => $e->getMessage()
@@ -123,45 +122,75 @@ class DapodikModel extends Model
     {
         $saved = 0;
         $updated = 0;
+        $now = date('Y-m-d H:i:s');
         
+        // Asumsikan ada helper function untuk menyimpan riwayat (Lihat bagian 2)
+        // $this->load->model('PtkRiwayatModel'); 
+
         $this->db->transStart();
-        
+
         try {
             foreach ($data as $row) {
-                $ptk_id = $row['ptk_id'] ?? '';
+                $ptk_id = trim($row['ptk_id'] ?? '');
+                
+                // Periksa kunci utama ptk_id
                 if (empty($ptk_id)) continue;
                 
                 $existing = $this->db->table('ptk')->where('ptk_id', $ptk_id)->get()->getRow();
                 
+                // PENYESUAIAN MAPPING KOLOM PTK
                 $saveData = [
                     'ptk_id' => $ptk_id,
+                    'ptk_terdaftar_id' => $row['ptk_terdaftar_id'] ?? null,
+                    'tahun_ajaran_id' => $row['tahun_ajaran_id'] ?? null,
+                    'ptk_induk' => (int)($row['ptk_induk'] ?? 0), // Konversi ke INT/BOOLEAN
+                    'tanggal_surat_tugas' => $row['tanggal_surat_tugas'] ?? null, // Harus DATE
                     'nama' => $row['nama'] ?? '',
-                    'nip' => $row['nip'] ?? '',
-                    'nuptk' => $row['nuptk'] ?? '',
                     'jenis_kelamin' => $row['jenis_kelamin'] ?? '',
                     'tempat_lahir' => $row['tempat_lahir'] ?? '',
-                    'tanggal_lahir' => $row['tanggal_lahir'] ?? null,
-                    'agama' => $row['agama_id'] ?? '',
-                    'alamat' => $row['alamat_jalan'] ?? '',
-                    'telepon' => $row['nomor_telepon'] ?? '',
-                    'email' => $row['email'] ?? '',
-                    'status_kepegawaian' => $row['status_kepegawaian_id'] ?? '',
-                    'jenis_ptk' => $row['jenis_ptk_id'] ?? '',
-                    'updated_at' => date('Y-m-d H:i:s')
+                    'tanggal_lahir' => $row['tanggal_lahir'] ?? null, // Harus DATE
+                    'agama_id' => (int)($row['agama_id'] ?? 0), // Konversi ke INT
+                    'agama_id_str' => $row['agama_id_str'] ?? '',
+                    'nuptk' => $row['nuptk'] ?? null,
+                    'nik' => $row['nik'] ?? null,
+                    'jenis_ptk_id' => $row['jenis_ptk_id'] ?? null,
+                    'jenis_ptk_id_str' => $row['jenis_ptk_id_str'] ?? '',
+                    'jabatan_ptk_id' => $row['jabatan_ptk_id'] ?? null,
+                    'jabatan_ptk_id_str' => $row['jabatan_ptk_id_str'] ?? '',
+                    'status_kepegawaian_id' => (int)($row['status_kepegawaian_id'] ?? 0), // Konversi ke INT
+                    'status_kepegawaian_id_str' => $row['status_kepegawaian_id_str'] ?? '',
+                    'nip' => $row['nip'] ?? null,
+                    'pendidikan_terakhir' => $row['pendidikan_terakhir'] ?? null,
+                    'bidang_studi_terakhir' => $row['bidang_studi_terakhir'] ?? null,
+                    'pangkat_golongan_terakhir' => $row['pangkat_golongan_terakhir'] ?? null,
+                    'updated_at' => $now
                 ];
                 
                 if ($existing) {
+                    // UPDATE
                     $this->db->table('ptk')->where('ptk_id', $ptk_id)->update($saveData);
                     $updated++;
                 } else {
-                    $saveData['created_at'] = date('Y-m-d H:i:s');
+                    // INSERT
+                    $saveData['created_at'] = $now;
                     $this->db->table('ptk')->insert($saveData);
                     $saved++;
                 }
-            }
+                
+                // --- PENANGANAN DATA NESTED (RIWAYAT PENDIDIKAN) ---
+                if (!empty($row['rwy_pend_formal'])) {
+                    // Panggil fungsi untuk menyimpan riwayat
+                    $this->_savePtkRiwayatFormal($ptk_id, $row['rwy_pend_formal'], $now);
+                }
+                
+                // Abaikan rwy_kepangkatan karena data contoh kosong, tapi logikanya sama
+                // if (!empty($row['rwy_kepangkatan'])) { ... }
+                
+            } // End Foreach
             
             $this->db->transComplete();
             
+            // ... (blok transStatus dan return)
             if ($this->db->transStatus() === false) {
                 throw new \Exception('Transaksi database gagal');
             }
@@ -175,10 +204,47 @@ class DapodikModel extends Model
             
         } catch (\Exception $e) {
             $this->db->transRollback();
+            // Disarankan untuk menambahkan logging di sini (log_message('error', $e->getMessage()))
             return [
                 'success' => false,
                 'message' => $e->getMessage()
             ];
+        }
+    }
+
+    private function _savePtkRiwayatFormal(string $ptk_id, array $riwayat_data, string $now)
+    {
+        $tableName = 'ptk_rwy_pend_formal';
+        $batchData = [];
+
+        // 1. Hapus semua riwayat lama untuk PTK ini
+        // Ini adalah cara paling aman untuk sinkronisasi data relasional/nested
+        $this->db->table($tableName)->where('ptk_id', $ptk_id)->delete();
+
+        // 2. Siapkan data baru untuk insert batch
+        foreach ($riwayat_data as $rwy) {
+            $batchData[] = [
+                'riwayat_pendidikan_formal_id' => $rwy['riwayat_pendidikan_formal_id'] ?? uniqid(),
+                'ptk_id' => $ptk_id, // Kunci asing ke PTK utama
+                'satuan_pendidikan_formal' => $rwy['satuan_pendidikan_formal'] ?? null,
+                'fakultas' => $rwy['fakultas'] ?? null,
+                'kependidikan' => (int)($rwy['kependidikan'] ?? 0),
+                'tahun_masuk' => $rwy['tahun_masuk'] ?? null,
+                'tahun_lulus' => $rwy['tahun_lulus'] ?? null,
+                'nim' => $rwy['nim'] ?? null,
+                'status_kuliah' => $rwy['status_kuliah'] ?? null,
+                'semester' => $rwy['semester'] ?? null,
+                'ipk' => (float)($rwy['ipk'] ?? 0.00), // Konversi ke FLOAT
+                'prodi' => $rwy['prodi'] ?? null,
+                'bidang_studi_id_str' => $rwy['bidang_studi_id_str'] ?? null,
+                'jenjang_pendidikan_id_str' => $rwy['jenjang_pendidikan_id_str'] ?? null,
+                'gelar_akademik_id_str' => $rwy['gelar_akademik_id_str'] ?? null,
+            ];
+        }
+
+        // 3. Masukkan semua data baru
+        if (!empty($batchData)) {
+            $this->db->table($tableName)->insertBatch($batchData);
         }
     }
     
@@ -198,81 +264,227 @@ class DapodikModel extends Model
     
     // ==================== PESERTA DIDIK METHODS ====================
     
-    public function savePesertaDidikFromDapodik($data)
+    public function savePesertaDidikFromDapodik($dataPD)
     {
         $saved = 0;
         $updated = 0;
-        
+        $now = date('Y-m-d H:i:s');
+        $tableName = 'pd'; 
+
+        if (empty($dataPD)) {
+            return ['success' => false, 'message' => 'Data Peserta Didik kosong.'];
+        }
+
         $this->db->transStart();
-        
+
         try {
-            foreach ($data as $row) {
-                $peserta_didik_id = $row['peserta_didik_id'] ?? '';
-                if (empty($peserta_didik_id)) continue;
+            foreach ($dataPD as $row) {
+                $pd_id = trim($row['peserta_didik_id'] ?? '');
                 
-                $existing = $this->db->table('peserta_didik')->where('peserta_didik_id', $peserta_didik_id)->get()->getRow();
+                if (empty($pd_id)) continue; 
+
+                $existing = $this->db->table($tableName)->where('peserta_didik_id', $pd_id)->get()->getRow();
                 
+                // Mapping dan Konversi Tipe Data
                 $saveData = [
-                    'peserta_didik_id' => $peserta_didik_id,
+                    'peserta_didik_id' => $pd_id,
+                    'registrasi_id' => $row['registrasi_id'] ?? null,
+                    'jenis_pendaftaran_id' => $row['jenis_pendaftaran_id'] ?? null,
+                    'jenis_pendaftaran_id_str' => $row['jenis_pendaftaran_id_str'] ?? null,
+                    'nipd' => $row['nipd'] ?? null,
+                    'tanggal_masuk_sekolah' => $row['tanggal_masuk_sekolah'] ?? null, // DATE
+                    'sekolah_asal' => $row['sekolah_asal'] ?? null,
                     'nama' => $row['nama'] ?? '',
-                    'nisn' => $row['nisn'] ?? '',
-                    'nis' => $row['nis'] ?? '',
-                    'jenis_kelamin' => $row['jenis_kelamin'] ?? '',
-                    'tempat_lahir' => $row['tempat_lahir'] ?? '',
-                    'tanggal_lahir' => $row['tanggal_lahir'] ?? null,
-                    'agama' => $row['agama_id'] ?? '',
-                    'alamat' => $row['alamat_jalan'] ?? '',
-                    'nama_ayah' => $row['nama_ayah'] ?? '',
-                    'nama_ibu' => $row['nama_ibu'] ?? '',
-                    'status_dalam_keluarga' => $row['status_dalam_keluarga_id'] ?? '',
-                    'updated_at' => date('Y-m-d H:i:s')
+                    'nisn' => $row['nisn'] ?? null,
+                    'jenis_kelamin' => $row['jenis_kelamin'] ?? null,
+                    'nik' => $row['nik'] ?? null,
+                    'tempat_lahir' => $row['tempat_lahir'] ?? null,
+                    'tanggal_lahir' => $row['tanggal_lahir'] ?? null, // DATE
+                    'agama_id' => (int)($row['agama_id'] ?? 0),
+                    'agama_id_str' => $row['agama_id_str'] ?? null,
+                    'nomor_telepon_rumah' => $row['nomor_telepon_rumah'] ?? null,
+                    'nomor_telepon_seluler' => $row['nomor_telepon_seluler'] ?? null,
+                    'email' => $row['email'] ?? null,
+                    'nama_ayah' => $row['nama_ayah'] ?? null,
+                    'pekerjaan_ayah_id' => (int)($row['pekerjaan_ayah_id'] ?? 0),
+                    'pekerjaan_ayah_id_str' => $row['pekerjaan_ayah_id_str'] ?? null,
+                    'nama_ibu' => $row['nama_ibu'] ?? null,
+                    'pekerjaan_ibu_id' => (int)($row['pekerjaan_ibu_id'] ?? 0),
+                    'pekerjaan_ibu_id_str' => $row['pekerjaan_ibu_id_str'] ?? null,
+                    'nama_wali' => $row['nama_wali'] ?? null,
+                    'pekerjaan_wali_id' => (int)($row['pekerjaan_wali_id'] ?? 0),
+                    'pekerjaan_wali_id_str' => $row['pekerjaan_wali_id_str'] ?? null,
+                    'anak_keberapa' => $row['anak_keberapa'] ?? null,
+                    'tinggi_badan' => (int)($row['tinggi_badan'] ?? 0),
+                    'berat_badan' => (int)($row['berat_badan'] ?? 0),
+                    'kebutuhan_khusus' => $row['kebutuhan_khusus'] ?? null,
+                    'updated_at' => $now
                 ];
-                
+
                 if ($existing) {
-                    $this->db->table('peserta_didik')->where('peserta_didik_id', $peserta_didik_id)->update($saveData);
+                    $this->db->table($tableName)->where('peserta_didik_id', $pd_id)->update($saveData);
                     $updated++;
                 } else {
-                    $saveData['created_at'] = date('Y-m-d H:i:s');
-                    $this->db->table('peserta_didik')->insert($saveData);
+                    $saveData['created_at'] = $now;
+                    $this->db->table($tableName)->insert($saveData);
                     $saved++;
                 }
-            }
-            
+            } // End Foreach
+
             $this->db->transComplete();
-            
+
             if ($this->db->transStatus() === false) {
-                throw new \Exception('Transaksi database gagal');
+                throw new \Exception('Transaksi database gagal saat menyimpan Peserta Didik.');
             }
-            
+
             return [
                 'success' => true,
                 'saved' => $saved,
                 'updated' => $updated,
                 'total' => $saved + $updated
             ];
-            
+
         } catch (\Exception $e) {
             $this->db->transRollback();
-            return [
-                'success' => false,
-                'message' => $e->getMessage()
-            ];
+            log_message('error', 'PD Save Exception: ' . $e->getMessage());
+            return ['success' => false, 'message' => $e->getMessage()];
         }
     }
-    
+
     public function truncatePesertaDidik()
     {
-        return $this->db->table('peserta_didik')->truncate();
+        return $this->db->table('pd')->truncate();
     }
-    
     public function getPesertaDidikStatistics()
     {
         return [
-            'total' => $this->db->table('peserta_didik')->countAll(),
-            'laki_laki' => $this->db->table('peserta_didik')->where('jenis_kelamin', 'L')->countAllResults(),
-            'perempuan' => $this->db->table('peserta_didik')->where('jenis_kelamin', 'P')->countAllResults()
+            'total' => $this->db->table('pd')->countAll(),
+            'laki_laki' => $this->db->table('pd')->where('jenis_kelamin', 'L')->countAllResults(),
+            'perempuan' => $this->db->table('pd')->where('jenis_kelamin', 'P')->countAllResults()
         ];
     }
+
+    public function saveRombelAnggotaFromDapodik($dataRombel)
+    {
+        $rombel_saved = 0;
+        $rombel_updated = 0;
+        $anggota_saved = 0;
+        $now = date('Y-m-d H:i:s');
+        $rombelTable = 'rombel';
+        $anggotaTable = 'anggota_rombel';
+
+        if (empty($dataRombel)) {
+            return ['success' => false, 'message' => 'Data Rombongan Belajar kosong.'];
+        }
+        
+        $this->db->transStart();
+
+        try {
+            foreach ($dataRombel as $row) {
+                $rombel_id = trim($row['rombongan_belajar_id'] ?? '');
+                
+                if (empty($rombel_id)) continue; 
+
+                $existingRombel = $this->db->table($rombelTable)->where('rombongan_belajar_id', $rombel_id)->get()->getRow();
+                
+                // Mapping Data Rombel
+                $saveRombel = [
+                    'rombongan_belajar_id' => $rombel_id,
+                    'nama' => $row['nama'] ?? null,
+                    'tingkat_pendidikan_id' => $row['tingkat_pendidikan_id'] ?? null,
+                    'tingkat_pendidikan_id_str' => $row['tingkat_pendidikan_id_str'] ?? null,
+                    'semester_id' => $row['semester_id'] ?? null,
+                    'jenis_rombel' => $row['jenis_rombel'] ?? null,
+                    'jenis_rombel_str' => $row['jenis_rombel_str'] ?? null,
+                    'kurikulum_id' => (int)($row['kurikulum_id'] ?? 0),
+                    'kurikulum_id_str' => $row['kurikulum_id_str'] ?? null,
+                    'id_ruang' => $row['id_ruang'] ?? null,
+                    'id_ruang_str' => $row['id_ruang_str'] ?? null,
+                    'moving_class' => $row['moving_class'] ?? null,
+                    'ptk_id' => $row['ptk_id'] ?? null,
+                    'ptk_id_str' => $row['ptk_id_str'] ?? null,
+                    'updated_at' => $now
+                ];
+
+                // 1. Upsert Data Rombel
+                if ($existingRombel) {
+                    $this->db->table($rombelTable)->where('rombongan_belajar_id', $rombel_id)->update($saveRombel);
+                    $rombel_updated++;
+                } else {
+                    $saveRombel['created_at'] = $now;
+                    $this->db->table($rombelTable)->insert($saveRombel);
+                    $rombel_saved++;
+                }
+                
+                // 2. Sinkronisasi Data Anggota Rombel (Nested Data)
+                $anggotaRombelData = $row['anggota_rombel'] ?? [];
+                if (!empty($anggotaRombelData)) {
+                    $this->_syncAnggotaRombel($rombel_id, $anggotaRombelData, $anggotaTable, $now, $anggota_saved);
+                }
+            } // End Foreach
+
+            $this->db->transComplete();
+            
+            if ($this->db->transStatus() === false) {
+                throw new \Exception('Transaksi database gagal saat menyimpan Rombel.');
+            }
+            
+            return [
+                'success' => true,
+                'rombel_saved' => $rombel_saved,
+                'rombel_updated' => $rombel_updated,
+                'anggota_saved' => $anggota_saved,
+                'total' => $rombel_saved + $rombel_updated
+            ];
+
+        } catch (\Exception $e) {
+            $this->db->transRollback();
+            log_message('error', 'Rombel Save Exception: ' . $e->getMessage());
+            return ['success' => false, 'message' => $e->getMessage()];
+        }
+    }
+
+    public function truncateRombel()
+    {
+        return $this->db->table('rombel')->truncate();
+    }
+
+    public function getRombelStatistics()
+    {
+        return [
+            'total' => $this->db->table('rombel')->countAll(),
+            '7' => $this->db->table('rombel')->where('tingkat_pendidikan_id', '7')->countAllResults(),
+            '8' => $this->db->table('rombel')->where('tingkat_pendidikan_id', '8')->countAllResults(),
+            '9' => $this->db->table('rombel')->where('tingkat_pendidikan_id', '9')->countAllResults()
+        ];
+    }
+
+    /**
+     * Helper function untuk menghapus dan memasukkan ulang anggota rombel (sinkronisasi penuh).
+     */
+    private function _syncAnggotaRombel(string $rombel_id, array $anggota_data, string $tableName, string $now, int &$anggota_saved)
+    {
+        // Hapus semua anggota rombel lama untuk rombel ini
+        $this->db->table($tableName)->where('rombongan_belajar_id', $rombel_id)->delete();
+
+        $batchData = [];
+        foreach ($anggota_data as $anggota) {
+            $batchData[] = [
+                'anggota_rombel_id' => $anggota['anggota_rombel_id'] ?? uniqid(),
+                'peserta_didik_id' => $anggota['peserta_didik_id'] ?? null,
+                'rombongan_belajar_id' => $rombel_id, // Kunci asing
+                'jenis_pendaftaran_id' => $anggota['jenis_pendaftaran_id'] ?? null,
+                'jenis_pendaftaran_id_str' => $anggota['jenis_pendaftaran_id_str'] ?? null,
+                'created_at' => $now,
+                'updated_at' => $now,
+            ];
+        }
+
+        if (!empty($batchData)) {
+            $this->db->table($tableName)->insertBatch($batchData);
+            $anggota_saved += count($batchData); // Tambahkan ke penghitung global
+        }
+    }       
     
     // ==================== PENGGUNA METHODS ====================
     
@@ -357,6 +569,8 @@ class DapodikModel extends Model
                 return $this->savePtkFromDapodik($data);
             case 'peserta_didik':
                 return $this->savePesertaDidikFromDapodik($data);
+            case 'rombongan_belajar':
+                return $this->saveRombelAnggotaFromDapodik($data);
             case 'pengguna':
                 return $this->savePenggunaFromDapodik($data);
             default:
@@ -376,6 +590,8 @@ class DapodikModel extends Model
                 return $this->truncatePtk();
             case 'peserta_didik':
                 return $this->truncatePesertaDidik();
+            case 'rombongan_belajar':
+                return $this->truncateRombel();
             case 'pengguna':
                 return $this->truncatePengguna();
             default:
@@ -393,6 +609,8 @@ class DapodikModel extends Model
                     return $this->getPtkStatistics();
                 case 'peserta_didik':
                     return $this->getPesertaDidikStatistics();
+                case 'rombongan_belajar':
+                    return $this->getRombelStatistics();
                 case 'pengguna':
                     return $this->getPenggunaStatistics();
                 default:
@@ -405,6 +623,7 @@ class DapodikModel extends Model
             'sekolah' => $this->getSekolahStatistics(),
             'ptk' => $this->getPtkStatistics(),
             'peserta_didik' => $this->getPesertaDidikStatistics(),
+            'rombongan_belajar' => $this->getRombelStatistics(),
             'pengguna' => $this->getPenggunaStatistics()
         ];
     }

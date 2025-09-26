@@ -16,8 +16,7 @@
                     <button class="btn btn-warning" onclick="testConnection()">
                         <i class="fas fa-wifi me-2"></i>
                         <span class="btn-text">Test Koneksi Dapodik</span>
-                        <span class="loading">
-                            <span class="spinner-border spinner-border-sm me-1"></span>
+                        <span class="loading" style="display: none;"> <span class="spinner-border spinner-border-sm me-1"></span>
                             Testing...
                         </span>
                     </button>
@@ -62,7 +61,7 @@
                                     <button class="btn btn-success btn-sm me-2" onclick="checkData('sekolah')">
                                         <i class="fas fa-search me-1"></i>
                                         <span class="btn-text">Cek Data</span>
-                                        <span class="loading">
+                                        <span class="loading" style="display: none;">
                                             <span class="spinner-border spinner-border-sm me-1"></span>
                                             Mengecek...
                                         </span>
@@ -70,13 +69,14 @@
                                     <button class="btn btn-primary btn-sm" onclick="saveData('sekolah')" disabled>
                                         <i class="fas fa-download me-1"></i>
                                         <span class="btn-text">Simpan Data</span>
-                                        <span class="loading">
+                                        <span class="loading" style="display: none;">
                                             <span class="spinner-border spinner-border-sm me-1"></span>
                                             Menyimpan...
                                         </span>
                                     </button>
                                 </td>
                             </tr>
+
                             <tr data-type="ptk">
                                 <td>
                                     <div class="d-flex align-items-center">
@@ -102,7 +102,7 @@
                                     <button class="btn btn-success btn-sm me-2" onclick="checkData('ptk')">
                                         <i class="fas fa-search me-1"></i>
                                         <span class="btn-text">Cek Data</span>
-                                        <span class="loading">
+                                        <span class="loading" style="display: none;">
                                             <span class="spinner-border spinner-border-sm me-1"></span>
                                             Mengecek...
                                         </span>
@@ -110,13 +110,14 @@
                                     <button class="btn btn-primary btn-sm" onclick="saveData('ptk')" disabled>
                                         <i class="fas fa-download me-1"></i>
                                         <span class="btn-text">Simpan Data</span>
-                                        <span class="loading">
+                                        <span class="loading" style="display: none;">
                                             <span class="spinner-border spinner-border-sm me-1"></span>
                                             Menyimpan...
                                         </span>
                                     </button>
                                 </td>
                             </tr>
+
                             <tr data-type="peserta_didik">
                                 <td>
                                     <div class="d-flex align-items-center">
@@ -142,7 +143,7 @@
                                     <button class="btn btn-success btn-sm me-2" onclick="checkData('peserta_didik')">
                                         <i class="fas fa-search me-1"></i>
                                         <span class="btn-text">Cek Data</span>
-                                        <span class="loading">
+                                        <span class="loading" style="display: none;">
                                             <span class="spinner-border spinner-border-sm me-1"></span>
                                             Mengecek...
                                         </span>
@@ -150,13 +151,55 @@
                                     <button class="btn btn-primary btn-sm" onclick="saveData('peserta_didik')" disabled>
                                         <i class="fas fa-download me-1"></i>
                                         <span class="btn-text">Simpan Data</span>
-                                        <span class="loading">
+                                        <span class="loading" style="display: none;">
                                             <span class="spinner-border spinner-border-sm me-1"></span>
                                             Menyimpan...
                                         </span>
                                     </button>
                                 </td>
                             </tr>
+
+                            <tr data-type="rombongan_belajar">
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <i class="fas fa-chalkboard-teacher text-danger me-3"></i>
+                                        <div>
+                                            <strong>Data Rombongan Belajar</strong>
+                                            <br>
+                                            <small class="text-muted">Kelas dan Walikelas</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="data-info">
+                                        <span class="fw-bold text-dark" id="count-rombongan_belajar">-</span>
+                                        <span class="text-muted">data tersedia</span>
+                                        <div class="progress mt-2" style="display: none;" id="progress-rombongan_belajar">
+                                            <div class="progress-bar bg-success" role="progressbar" style="width: 0%"></div>
+                                        </div>
+                                        <small class="text-muted" id="progress-text-rombongan_belajar"></small>
+                                    </div>
+                                </td>
+                                <td>
+                                    <button class="btn btn-success btn-sm me-2" onclick="checkData('rombongan_belajar')">
+                                        <i class="fas fa-search me-1"></i>
+                                        <span class="btn-text">Cek Data</span>
+                                        <span class="loading" style="display: none;">
+                                            <span class="spinner-border spinner-border-sm me-1"></span>
+                                            Mengecek...
+                                        </span>
+                                    </button>
+                                    <button class="btn btn-primary btn-sm" onclick="saveData('rombongan_belajar')" disabled>
+                                        <i class="fas fa-download me-1"></i>
+                                        <span class="btn-text">Simpan Data</span>
+                                        <span class="loading" style="display: none;">
+                                            <span class="spinner-border spinner-border-sm me-1"></span>
+                                            Menyimpan...
+                                        </span>
+                                    </button>
+                                </td>
+                            </tr>
+
                             <tr data-type="pengguna">
                                 <td>
                                     <div class="d-flex align-items-center">
@@ -182,7 +225,7 @@
                                     <button class="btn btn-success btn-sm me-2" onclick="checkData('pengguna')">
                                         <i class="fas fa-search me-1"></i>
                                         <span class="btn-text">Cek Data</span>
-                                        <span class="loading">
+                                        <span class="loading" style="display: none;">
                                             <span class="spinner-border spinner-border-sm me-1"></span>
                                             Mengecek...
                                         </span>
@@ -190,7 +233,7 @@
                                     <button class="btn btn-primary btn-sm" onclick="saveData('pengguna')" disabled>
                                         <i class="fas fa-download me-1"></i>
                                         <span class="btn-text">Simpan Data</span>
-                                        <span class="loading">
+                                        <span class="loading" style="display: none;">
                                             <span class="spinner-border spinner-border-sm me-1"></span>
                                             Menyimpan...
                                         </span>
@@ -216,31 +259,43 @@
 
     <script>
         // Base URL untuk API - sesuaikan dengan konfigurasi Anda
-        const baseUrl = '/tarik-dapo'; // Ganti dengan base URL controller Anda
+        const baseUrl = '<?= base_url('tarik-dapo'); ?>'; // Menggunakan base_url() helper CodeIgniter 4
         
+        // Fungsi untuk mengaktifkan status loading pada tombol
+        function startLoading(button) {
+            button.prop('disabled', true);
+            button.find('.btn-text').hide();
+            button.find('.loading').show();
+        }
+
+        // Fungsi untuk menonaktifkan status loading pada tombol
+        function stopLoading(button) {
+            button.prop('disabled', false);
+            button.find('.btn-text').show();
+            button.find('.loading').hide();
+        }
+
         function testConnection() {
             const button = $('.btn-warning');
             
             // Show loading state
-            button.prop('disabled', true);
-            button.find('.btn-text').hide();
-            button.find('.loading').show();
+            startLoading(button);
             
             // Update status badge
             $('#connection-status').removeClass('bg-success bg-danger bg-secondary')
-                                  .addClass('bg-warning')
-                                  .html('<i class="fas fa-spinner fa-spin me-1"></i>Testing...');
+                                        .addClass('bg-warning')
+                                        .html('<i class="fas fa-spinner fa-spin me-1"></i>Testing...');
             
             $.ajax({
-                url: `${baseUrl}/testConnection`,
+                url: `${baseUrl}/test-connection`,
                 method: 'GET',
                 dataType: 'json',
                 success: function(response) {
                     if (response.success) {
                         // Update status badge to success
                         $('#connection-status').removeClass('bg-warning bg-danger bg-secondary')
-                                              .addClass('bg-success')
-                                              .html('<i class="fas fa-check-circle me-1"></i>Terhubung');
+                                                    .addClass('bg-success')
+                                                    .html('<i class="fas fa-check-circle me-1"></i>Terhubung');
                         
                         // Show success notification
                         Swal.fire({
@@ -260,8 +315,8 @@
                     } else {
                         // Update status badge to error
                         $('#connection-status').removeClass('bg-warning bg-success bg-secondary')
-                                              .addClass('bg-danger')
-                                              .html('<i class="fas fa-times-circle me-1"></i>Gagal');
+                                                    .addClass('bg-danger')
+                                                    .html('<i class="fas fa-times-circle me-1"></i>Gagal');
                         
                         // Show error notification
                         Swal.fire({
@@ -281,8 +336,8 @@
                 error: function(xhr, status, error) {
                     // Update status badge to error
                     $('#connection-status').removeClass('bg-warning bg-success bg-secondary')
-                                          .addClass('bg-danger')
-                                          .html('<i class="fas fa-times-circle me-1"></i>Error');
+                                            .addClass('bg-danger')
+                                            .html('<i class="fas fa-times-circle me-1"></i>Error');
                     
                     // Show error notification
                     Swal.fire({
@@ -303,9 +358,7 @@
                 },
                 complete: function() {
                     // Hide loading state
-                    button.prop('disabled', false);
-                    button.find('.btn-text').show();
-                    button.find('.loading').hide();
+                    stopLoading(button);
                 }
             });
         }
@@ -315,9 +368,7 @@
             const saveButton = $(`tr[data-type="${type}"] .btn-primary`);
             
             // Show loading state
-            button.prop('disabled', true);
-            button.find('.btn-text').hide();
-            button.find('.loading').show();
+            startLoading(button);
             
             $.ajax({
                 url: `${baseUrl}/checkData/${type}`,
@@ -358,9 +409,7 @@
                 },
                 complete: function() {
                     // Hide loading state
-                    button.prop('disabled', false);
-                    button.find('.btn-text').show();
-                    button.find('.loading').hide();
+                    stopLoading(button);
                 }
             });
         }
@@ -383,13 +432,12 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     // Show loading state
-                    button.prop('disabled', true);
-                    button.find('.btn-text').hide();
-                    button.find('.loading').show();
+                    startLoading(button);
                     
                     // Show progress bar
                     progressBar.show();
                     progressBar.find('.progress-bar').css('width', '0%');
+                    progressText.text('Memulai proses sinkronisasi...');
                     
                     // Start save process
                     $.ajax({
@@ -398,12 +446,19 @@
                         dataType: 'json',
                         success: function(response) {
                             if (response.success) {
-                                // Simulate progress updates
+                                console.log(response.message)
+                                // Simulate progress updates (since actual real-time progress is complex with standard AJAX)
                                 let progress = 0;
+                                const totalExpectedTime = 3000; // 3 seconds simulation
+                                const intervalTime = 200;
+                                const steps = totalExpectedTime / intervalTime;
+                                let currentStep = 0;
+
                                 const interval = setInterval(function() {
-                                    progress += Math.random() * 20;
+                                    currentStep++;
+                                    progress = Math.min(100, (currentStep / steps) * 100);
+
                                     if (progress >= 100) {
-                                        progress = 100;
                                         clearInterval(interval);
                                         
                                         progressBar.find('.progress-bar').css('width', '100%');
@@ -431,9 +486,10 @@
                                         progressBar.find('.progress-bar').css('width', progress + '%');
                                         progressText.text(`Menyimpan... ${Math.round(progress)}%`);
                                     }
-                                }, 200);
+                                }, intervalTime);
                             } else {
                                 progressBar.hide();
+                                progressText.text('');
                                 Swal.fire({
                                     icon: 'error',
                                     title: 'Gagal Menyimpan Data',
@@ -444,6 +500,7 @@
                         },
                         error: function(xhr, status, error) {
                             progressBar.hide();
+                            progressText.text('');
                             Swal.fire({
                                 icon: 'error',
                                 title: 'Terjadi Kesalahan',
@@ -454,9 +511,8 @@
                         },
                         complete: function() {
                             // Hide loading state
-                            button.prop('disabled', false);
-                            button.find('.btn-text').show();
-                            button.find('.loading').hide();
+                            stopLoading(button);
+                            // Note: Progress bar remains visible until success timeout
                         }
                     });
                 }
@@ -464,4 +520,3 @@
         }
     </script>
 <?= $this->endSection(); ?>
-		
