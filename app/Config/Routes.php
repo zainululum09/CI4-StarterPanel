@@ -62,4 +62,4 @@ $routes->post('tarik-dapo/config/save', 'Tarik_dapo::saveConfig');
 $routes->get('tarik-dapo/config', 'Tarik_dapo::getConfig');
 
 // Statistik
-$routes->get('tarik-dapo/statistics', 'Tarik_dapo::getStatistics');
+$routes->get('tarik-dapo/statistics', 'Tarik_dapo::getStatistics');$routes->get('dapodik','Dapodik::index');

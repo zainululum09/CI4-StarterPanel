@@ -199,30 +199,29 @@
                                     </button>
                                 </td>
                             </tr>
-
-                            <tr data-type="pengguna">
+                            <tr data-type="anggota_rombongan_belajar">
                                 <td>
                                     <div class="d-flex align-items-center">
-                                        <i class="fas fa-user-cog text-info me-3"></i>
+                                        <i class="fas fa-chalkboard-teacher text-info me-3"></i>
                                         <div>
-                                            <strong>Data Pengguna</strong>
+                                            <strong>Data Anggota Rombongan Belajar</strong>
                                             <br>
-                                            <small class="text-muted">User dan hak akses sistem</small>
+                                            <small class="text-muted">Anggota Kelas</small>
                                         </div>
                                     </div>
                                 </td>
                                 <td>
                                     <div class="data-info">
-                                        <span class="fw-bold text-dark" id="count-pengguna">-</span>
+                                        <span class="fw-bold text-dark" id="count-anggota_rombongan_belajar">-</span>
                                         <span class="text-muted">data tersedia</span>
-                                        <div class="progress mt-2" style="display: none;" id="progress-pengguna">
+                                        <div class="progress mt-2" style="display: none;" id="progress-anggota_rombongan_belajar">
                                             <div class="progress-bar bg-success" role="progressbar" style="width: 0%"></div>
                                         </div>
-                                        <small class="text-muted" id="progress-text-pengguna"></small>
+                                        <small class="text-muted" id="progress-text-anggota_rombongan_belajar"></small>
                                     </div>
                                 </td>
                                 <td>
-                                    <button class="btn btn-success btn-sm me-2" onclick="checkData('pengguna')">
+                                    <button class="btn btn-success btn-sm me-2" onclick="checkData('anggota_rombongan_belajar')">
                                         <i class="fas fa-search me-1"></i>
                                         <span class="btn-text">Cek Data</span>
                                         <span class="loading" style="display: none;">
@@ -230,7 +229,7 @@
                                             Mengecek...
                                         </span>
                                     </button>
-                                    <button class="btn btn-primary btn-sm" onclick="saveData('pengguna')" disabled>
+                                    <button class="btn btn-primary btn-sm" onclick="saveData('anggota_rombongan_belajar')" disabled>
                                         <i class="fas fa-download me-1"></i>
                                         <span class="btn-text">Simpan Data</span>
                                         <span class="loading" style="display: none;">
@@ -496,6 +495,7 @@
                                     text: response.message || 'Terjadi kesalahan saat menyimpan data',
                                     confirmButtonColor: '#dc3545'
                                 });
+                                console.log(response.message);                                
                             }
                         },
                         error: function(xhr, status, error) {

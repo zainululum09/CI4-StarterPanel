@@ -364,7 +364,7 @@ class DapodikModel extends Model
         ];
     }
 
-    public function saveRombelAnggotaFromDapodik($dataRombel)
+    public function saveRombelFromDapodik($dataRombel)
     {
         $rombel_saved = 0;
         $rombel_updated = 0;
@@ -416,11 +416,6 @@ class DapodikModel extends Model
                     $rombel_saved++;
                 }
                 
-                // 2. Sinkronisasi Data Anggota Rombel (Nested Data)
-                $anggotaRombelData = $row['anggota_rombel'] ?? [];
-                if (!empty($anggotaRombelData)) {
-                    $this->_syncAnggotaRombel($rombel_id, $anggotaRombelData, $anggotaTable, $now, $anggota_saved);
-                }
             } // End Foreach
 
             $this->db->transComplete();
@@ -431,9 +426,8 @@ class DapodikModel extends Model
             
             return [
                 'success' => true,
-                'rombel_saved' => $rombel_saved,
-                'rombel_updated' => $rombel_updated,
-                'anggota_saved' => $anggota_saved,
+                'saved' => $rombel_saved,
+                'updated' => $rombel_updated,
                 'total' => $rombel_saved + $rombel_updated
             ];
 
@@ -449,6 +443,139 @@ class DapodikModel extends Model
         return $this->db->table('rombel')->truncate();
     }
 
+    // public function saveRombelAnggotaFromDapodik(array $dataAnggota)
+    // {
+    //     $saved   = 0;
+    //     $updated = 0;
+    //     $now     = date('Y-m-d H:i:s');
+    //     $table   = 'anggota_rombel';
+
+    //     if (empty($dataAnggota)) {
+    //         return [
+    //             'success' => false,
+    //             'message' => 'Data Anggota Rombel kosong.'
+    //         ];
+    //     }
+
+    //     // $this->db->transStart();
+
+    //     try {
+    //         foreach ($dataAnggota as $row) {
+    //         $rombel_id   = $row['rombongan_belajar_id'];
+    //         $anggotaList = $row['anggota_rombel'];
+
+    //             foreach ($anggotaList as $anggota) {
+    //                 $anggota_id = $anggota['anggota_rombel_id'];
+    //                 $pd_id      = $anggota['peserta_didik_id'];
+
+    //                 // Cek apakah data sudah ada
+    //                 $existing = $this->db->table($table)
+    //                     ->where('anggota_rombel_id', $anggota_id)
+    //                     ->get()
+    //                     ->getRow();
+
+    //                 $saveData = [
+    //                     'anggota_rombel_id'        => $anggota_id,
+    //                     'peserta_didik_id'         => $pd_id,
+    //                     'rombongan_belajar_id'     => $rombel_id,
+    //                     'jenis_pendaftaran_id'     => $anggota['jenis_pendaftaran_id'],
+    //                     'jenis_pendaftaran_id_str' => $anggota['jenis_pendaftaran_id_str'],
+    //                     'updated_at'               => $now
+    //                 ];
+
+    //                 if ($existing) {
+    //                     $this->db->table($table)
+    //                         ->where('anggota_rombel_id', $anggota_id)
+    //                         ->update($saveData);
+    //                     $updated++;
+    //                 } else {
+    //                     $saveData['created_at'] = $now;
+    //                     $this->db->table($table)->insert($saveData);
+    //                     $saved++;
+    //                 }
+    //             }
+    //         }
+
+    //         // $this->db->transComplete();
+
+    //         // if ($this->db->transStatus() === false) {
+    //         //     throw new \Exception('Transaksi database gagal saat menyimpan Anggota Rombel.');
+    //         // }
+
+    //         return [
+    //             'success' => true,
+    //             'rombel_saved'   => $saved,
+    //             'rombel_updated' => $updated,
+    //             'total'   => $saved + $updated
+    //         ];
+
+    //     } catch (\Exception $e) {
+    //         $this->db->transRollback();
+    //         log_message('error', 'Anggota Rombel Save Exception: ' . $e->getMessage());
+    //         return [
+    //             'success' => false,
+    //             // 'message' => $dataAnggota
+    //             'message' => $e->getMessage()
+    //         ];
+    //     }
+    // }
+
+    public function saveRombelAnggotaFromDapodik(array $dataRombel)
+    {
+        $saved   = 0;
+        $updated = 0;
+        $now     = date('Y-m-d H:i:s');
+        $table   = 'anggota_rombel';
+        $debug = '';
+        // $anggotaList = 0;
+
+        foreach ($dataRombel as $row) {
+            $rombel_id   = $row['rombongan_belajar_id'];
+            $anggotaList = $row['anggota_rombel'];
+
+                foreach ($anggotaList as $anggota) {
+                    $anggota_id = $anggota['anggota_rombel_id'];
+                    $pd_id      = $anggota['peserta_didik_id'];
+
+                    // Cek apakah data sudah ada
+                    $existing = $this->db->table($table)
+                        ->where('peserta_didik_id', $pd_id)
+                        ->get()
+                        ->getRow();
+
+                    $saveData = [
+                        'anggota_rombel_id'        => $anggota_id,
+                        'peserta_didik_id'         => $pd_id,
+                        'rombongan_belajar_id'     => $rombel_id,
+                        'jenis_pendaftaran_id'     => $anggota['jenis_pendaftaran_id'],
+                        'jenis_pendaftaran_id_str' => $anggota['jenis_pendaftaran_id_str'],
+                        'updated_at'               => $now
+                    ];
+
+                    if ($existing) {
+                        $this->db->table($table)
+                            ->where('anggota_rombel_id', $anggota_id)
+                            ->update($saveData);
+                        $updated++;
+                    } else {
+                        $saveData['created_at'] = $now;
+                        $this->db->table($table)->insert($saveData);
+                        $saved++;
+                    }
+                }
+        }
+
+        return [
+            'success'    => true,
+            'saved'      => $saved,
+            'updated'    => $updated,
+            'total'      => $saved + $updated,
+            // 'total'   => count($anggotaList),
+            'message'    => count($anggotaList)
+        ];
+    }
+
+
     public function getRombelStatistics()
     {
         return [
@@ -462,101 +589,7 @@ class DapodikModel extends Model
     /**
      * Helper function untuk menghapus dan memasukkan ulang anggota rombel (sinkronisasi penuh).
      */
-    private function _syncAnggotaRombel(string $rombel_id, array $anggota_data, string $tableName, string $now, int &$anggota_saved)
-    {
-        // Hapus semua anggota rombel lama untuk rombel ini
-        $this->db->table($tableName)->where('rombongan_belajar_id', $rombel_id)->delete();
-
-        $batchData = [];
-        foreach ($anggota_data as $anggota) {
-            $batchData[] = [
-                'anggota_rombel_id' => $anggota['anggota_rombel_id'] ?? uniqid(),
-                'peserta_didik_id' => $anggota['peserta_didik_id'] ?? null,
-                'rombongan_belajar_id' => $rombel_id, // Kunci asing
-                'jenis_pendaftaran_id' => $anggota['jenis_pendaftaran_id'] ?? null,
-                'jenis_pendaftaran_id_str' => $anggota['jenis_pendaftaran_id_str'] ?? null,
-                'created_at' => $now,
-                'updated_at' => $now,
-            ];
-        }
-
-        if (!empty($batchData)) {
-            $this->db->table($tableName)->insertBatch($batchData);
-            $anggota_saved += count($batchData); // Tambahkan ke penghitung global
-        }
-    }       
-    
-    // ==================== PENGGUNA METHODS ====================
-    
-    public function savePenggunaFromDapodik($data)
-    {
-        $saved = 0;
-        $updated = 0;
         
-        $this->db->transStart();
-        
-        try {
-            foreach ($data as $row) {
-                $pengguna_id = $row['pengguna_id'] ?? '';
-                if (empty($pengguna_id)) continue;
-                
-                $existing = $this->db->table('pengguna')->where('pengguna_id', $pengguna_id)->get()->getRow();
-                
-                $saveData = [
-                    'pengguna_id' => $pengguna_id,
-                    'nama' => $row['nama'] ?? '',
-                    'username' => $row['nama_pengguna'] ?? '',
-                    'email' => $row['email'] ?? '',
-                    'peran' => $row['peran_id'] ?? '',
-                    'aktif' => $row['aktif'] ?? 1,
-                    'updated_at' => date('Y-m-d H:i:s')
-                ];
-                
-                if ($existing) {
-                    $this->db->table('pengguna')->where('pengguna_id', $pengguna_id)->update($saveData);
-                    $updated++;
-                } else {
-                    $saveData['created_at'] = date('Y-m-d H:i:s');
-                    $this->db->table('pengguna')->insert($saveData);
-                    $saved++;
-                }
-            }
-            
-            $this->db->transComplete();
-            
-            if ($this->db->transStatus() === false) {
-                throw new \Exception('Transaksi database gagal');
-            }
-            
-            return [
-                'success' => true,
-                'saved' => $saved,
-                'updated' => $updated,
-                'total' => $saved + $updated
-            ];
-            
-        } catch (\Exception $e) {
-            $this->db->transRollback();
-            return [
-                'success' => false,
-                'message' => $e->getMessage()
-            ];
-        }
-    }
-    
-    public function truncatePengguna()
-    {
-        return $this->db->table('pengguna')->truncate();
-    }
-    
-    public function getPenggunaStatistics()
-    {
-        return [
-            'total' => $this->db->table('pengguna')->countAll(),
-            'aktif' => $this->db->table('pengguna')->where('aktif', 1)->countAllResults(),
-            'non_aktif' => $this->db->table('pengguna')->where('aktif', 0)->countAllResults()
-        ];
-    }
     
     // ==================== GENERIC METHODS ====================
     
@@ -570,9 +603,9 @@ class DapodikModel extends Model
             case 'peserta_didik':
                 return $this->savePesertaDidikFromDapodik($data);
             case 'rombongan_belajar':
+                return $this->saveRombelFromDapodik($data);
+            case 'anggota_rombongan_belajar':
                 return $this->saveRombelAnggotaFromDapodik($data);
-            case 'pengguna':
-                return $this->savePenggunaFromDapodik($data);
             default:
                 return [
                     'success' => false,
@@ -592,8 +625,8 @@ class DapodikModel extends Model
                 return $this->truncatePesertaDidik();
             case 'rombongan_belajar':
                 return $this->truncateRombel();
-            case 'pengguna':
-                return $this->truncatePengguna();
+            case 'anggota_rombongan_belajar':
+                return $this->truncateAnggotaRombel();
             default:
                 return false;
         }
@@ -611,8 +644,6 @@ class DapodikModel extends Model
                     return $this->getPesertaDidikStatistics();
                 case 'rombongan_belajar':
                     return $this->getRombelStatistics();
-                case 'pengguna':
-                    return $this->getPenggunaStatistics();
                 default:
                     return [];
             }
@@ -623,8 +654,7 @@ class DapodikModel extends Model
             'sekolah' => $this->getSekolahStatistics(),
             'ptk' => $this->getPtkStatistics(),
             'peserta_didik' => $this->getPesertaDidikStatistics(),
-            'rombongan_belajar' => $this->getRombelStatistics(),
-            'pengguna' => $this->getPenggunaStatistics()
+            'rombongan_belajar' => $this->getRombelStatistics()
         ];
     }
 }

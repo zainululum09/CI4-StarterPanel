@@ -138,7 +138,7 @@ class Tarik_dapo extends BaseController
     public function checkData($type)
     {
         try {
-            $validTypes = ['sekolah', 'ptk', 'peserta_didik', 'pengguna', 'rombongan_belajar'];
+            $validTypes = ['sekolah', 'ptk', 'peserta_didik', 'rombongan_belajar','anggota_rombongan_belajar'];
             if (!in_array($type, $validTypes)) {
                 return $this->response->setJSON([
                     'success' => false,
@@ -150,12 +150,28 @@ class Tarik_dapo extends BaseController
             // Asumsi $this->callDapodik() mengembalikan array: 
             // ['success' => bool, 'data' => array/null, 'message' => string]
             $data = $this->callDapodik($endpoint);
+
+            if($type == 'anggota_rombongan_belajar'){
+                $totalAnggota = 0;
+
+                foreach ($data['data'] as $rombel) {
+                    if (!empty($rombel['anggota_rombel'])) {
+                        $totalAnggota += count($rombel['anggota_rombel']);
+                    }
+                }
+
+                $count = "{$totalAnggota}";
+
+            } else {
+                $count = count($data['data']);
+            }
             
             if ($data['success']) {
                 // MENGIRIM SELURUH DATA KE RESPON JSON
                 return $this->response->setJSON([
                     'success' => true,
-                    'count'   => count($data['data']),
+                    'count'   => $count,
+                    // 'count'   => count($data['data']),
                     'message' => "Berhasil mengecek data {$type}. Siap untuk disinkronkan."
                 ]);
             } else {
@@ -178,7 +194,7 @@ class Tarik_dapo extends BaseController
     public function saveData($type)
     {
         try {
-            $validTypes = ['sekolah', 'ptk', 'peserta_didik', 'pengguna', 'rombongan_belajar'];
+            $validTypes = ['sekolah', 'ptk', 'peserta_didik', 'rombongan_belajar','anggota_rombongan_belajar'];
             if (!in_array($type, $validTypes)) {
                 return $this->response->setJSON([
                     'success' => false,
@@ -208,8 +224,8 @@ class Tarik_dapo extends BaseController
                     'saved' => $result['saved'],
                     'updated' => $result['updated'],
                     'total' => $result['total'],
-                    // 'message' => "Berhasil menyimpan {$result['total']} data {$type} ({$result['saved']} baru, {$result['updated']} diperbarui)"
-                    'message' => $result['debug']
+                    'message' => "Berhasil menyimpan {$result['total']} data {$type} ({$result['saved']} baru, {$result['updated']} diperbarui)"
+                    // 'message' => $result['debug']
                 ]);
             } else {
                 return $this->response->setJSON([
@@ -233,7 +249,7 @@ class Tarik_dapo extends BaseController
     public function deleteData($type)
     {
         try {
-            $validTypes = ['sekolah', 'ptk', 'peserta_didik', 'pengguna', 'rombongan_belajar'];
+            $validTypes = ['sekolah', 'ptk', 'peserta_didik', 'rombongan_belajar'];
             if (!in_array($type, $validTypes)) {
                 return $this->response->setJSON([
                     'success' => false,
@@ -344,8 +360,8 @@ class Tarik_dapo extends BaseController
             'sekolah' => 'getSekolah',
             'ptk' => 'getGtk',
             'peserta_didik' => 'getPesertaDidik',
-            'pengguna' => 'getPengguna',
-            'rombongan_belajar' => 'getRombonganBelajar'
+            'rombongan_belajar' => 'getRombonganBelajar',
+            'anggota_rombongan_belajar' => 'getRombonganBelajar'
         ];
         
         return $endpoints[$type] ?? null;
