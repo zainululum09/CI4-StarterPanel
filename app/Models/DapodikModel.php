@@ -542,6 +542,8 @@ class DapodikModel extends Model
                         ->where('peserta_didik_id', $pd_id)
                         ->get()
                         ->getRow();
+                    
+                    $cekPd = $this->db->table('pd')->where('peserta_didik_id', $pd_id)->get()->getRow();
 
                     $saveData = [
                         'anggota_rombel_id'        => $anggota_id,
@@ -554,13 +556,15 @@ class DapodikModel extends Model
 
                     if ($existing) {
                         $this->db->table($table)
-                            ->where('anggota_rombel_id', $anggota_id)
-                            ->update($saveData);
+                        ->where('anggota_rombel_id', $anggota_id)
+                        ->update($saveData);
                         $updated++;
-                    } else {
+                    } else if($cekPd){
                         $saveData['created_at'] = $now;
                         $this->db->table($table)->insert($saveData);
                         $saved++;
+                    } else {
+                        $updated++;
                     }
                 }
         }
@@ -655,6 +659,57 @@ class DapodikModel extends Model
             'ptk' => $this->getPtkStatistics(),
             'peserta_didik' => $this->getPesertaDidikStatistics(),
             'rombongan_belajar' => $this->getRombelStatistics()
+        ];
+    }
+
+    // getAllPd
+    public function getAllPd()
+    {
+        $db = \Config\Database::connect();
+        $builder = $db->table('anggota_rombel ar');
+        $builder->select('
+            pd.nama AS nama, 
+            r.nama AS kelas, 
+            pd.nipd AS nipd, 
+            pd.nisn AS nisn, 
+            pd.jenis_kelamin AS jenis_kelamin
+        ');
+        $builder->join(
+            'rombel r',  // Tabel target dan alias 'r'
+            'ar.rombongan_belajar_id = r.rombongan_belajar_id', // Kondisi ON
+            'inner' // Tipe JOIN (opsional, defaultnya LEFT)
+        );
+        $builder->join(
+            'pd', // Tabel target dan alias 'pd'
+            'ar.peserta_didik_id = pd.peserta_didik_id', // Kondisi ON
+            'inner'
+        );
+        $builder->orderBy('kelas ASC, nama ASC');
+        $data = $builder->get()->getResult();
+
+        $tr = '';
+        $i = 1;
+        foreach ($data as $row) {
+            $jk = $row->jenis_kelamin==="L"?"Laki-laki":"Perempuan";
+            $tr .= "<tr>
+                            <th scope='row'>".$i++."</th>
+                            <td>".$row->nipd."</td>
+                            <td>".$row->nisn."</td>
+                            <td>".strtoupper($row->nama)."</td>
+                            <td>".$jk."</td>
+                            <td>".$row->kelas."</td>
+                            <td><span class='badge bg-success'>Aktif</span></td>
+                            <td>
+                                <a href='#' class='btn btn-sm btn-info text-white me-1' title='Lihat Detail'><i class='fas fa-eye'></i></a>
+                                <a href='#' class='btn btn-sm btn-warning me-1' title='Edit Data'><i class='fas fa-edit'></i></a>
+                                <button class='btn btn-sm btn-danger' title='Hapus Data'><i class='fas fa-trash-alt'></i></button>
+                            </td>
+                        </tr>    ";
+        }
+
+        return [
+            'data' => $tr,
+            'total' => count($data)
         ];
     }
 }
