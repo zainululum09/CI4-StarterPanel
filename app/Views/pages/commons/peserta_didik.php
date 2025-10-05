@@ -1,10 +1,10 @@
 <?= $this->extend('layouts/main'); ?>
 <?= $this->section('content'); ?>
 <h1 class="h3 mb-3"><strong><?= $title; ?></strong></h1>
-<div class="container mt-5">
+<div class="container col-12 mt-5">
     <div class="card shadow">
         <div class="card-header bg-info text-white">
-            <h5 class="mb-0">Daftar Peserta Didik Aktif</h5>
+            <h4 class="mb-0">Daftar Peserta Didik Aktif</h4>
         </div>
         <div class="card-body">
             <div class="table-responsive">

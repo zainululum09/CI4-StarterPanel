@@ -16,11 +16,23 @@ class Dapodik extends BaseController
     {
         $tr = $this->dapodikModel->getAllPd();
         $data = array_merge($this->data, [
-            'title'         => 'Dapodik',
+            'title'         => 'Daftar Peserta Didik',
             'datasiswa'     => $tr['data'],
             'total'         => $tr['total']
         ]);
-        return view('pages/commons/dapodik', $data);
+        return view('pages/commons/peserta_didik', $data);
+    }
+
+    public function detailSiswa($nisn)
+    {
+        $detail = $this->dapodikModel->getSiswa($nisn);
+        $data = array_merge($this->data, [
+            'title' => 'Detail Siswa',
+            'siswa' => $detail['siswa'],
+            'kasus' => $detail['kasus']
+        ]);
+        // dd($data);
+        return view('pages/commons/detail_siswa', $data);
     }
 }
 		

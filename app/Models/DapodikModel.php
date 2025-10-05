@@ -283,14 +283,18 @@ class DapodikModel extends Model
                 
                 if (empty($pd_id)) continue; 
 
-                $existing = $this->db->table($tableName)->where('peserta_didik_id', $pd_id)->get()->getRow();
+                $existing = $this->db->table($tableName)
+                    ->join('alamat_siswa','alamat_siswa.peserta_didik_id = '.$tableName.'.peserta_didik_id', 'inner')
+                    ->join('orang_tua','orang_tua.peserta_didik_id = '.$tableName.'.peserta_didik_id','inner')
+                    ->join('kesehatan_siswa','kesehatan_siswa.peserta_didik_id = '.$tableName.'.peserta_didik_id','inner')
+                    ->where($tableName.'.peserta_didik_id', $pd_id)
+                    ->get()
+                    ->getRow();
                 
                 // Mapping dan Konversi Tipe Data
                 $saveData = [
                     'peserta_didik_id' => $pd_id,
                     'registrasi_id' => $row['registrasi_id'] ?? null,
-                    'jenis_pendaftaran_id' => $row['jenis_pendaftaran_id'] ?? null,
-                    'jenis_pendaftaran_id_str' => $row['jenis_pendaftaran_id_str'] ?? null,
                     'nipd' => $row['nipd'] ?? null,
                     'tanggal_masuk_sekolah' => $row['tanggal_masuk_sekolah'] ?? null, // DATE
                     'sekolah_asal' => $row['sekolah_asal'] ?? null,
@@ -301,32 +305,51 @@ class DapodikModel extends Model
                     'tempat_lahir' => $row['tempat_lahir'] ?? null,
                     'tanggal_lahir' => $row['tanggal_lahir'] ?? null, // DATE
                     'agama_id' => (int)($row['agama_id'] ?? 0),
-                    'agama_id_str' => $row['agama_id_str'] ?? null,
-                    'nomor_telepon_rumah' => $row['nomor_telepon_rumah'] ?? null,
-                    'nomor_telepon_seluler' => $row['nomor_telepon_seluler'] ?? null,
+                    'anak_keberapa' => $row['anak_keberapa'] ?? null,
+                    'updated_at' => $now
+                ];
+                
+                $contact = [
+                    'peserta_didik_id' => $pd_id,
+                    'telepon_rumah' => $row['nomor_telepon_rumah'] ?? null,
+                    'telepon_seluler' => $row['nomor_telepon_seluler'] ?? null,
                     'email' => $row['email'] ?? null,
+                ];
+                
+                $dataOrtu = [
+                    'peserta_didik_id' => $pd_id,
                     'nama_ayah' => $row['nama_ayah'] ?? null,
                     'pekerjaan_ayah_id' => (int)($row['pekerjaan_ayah_id'] ?? 0),
-                    'pekerjaan_ayah_id_str' => $row['pekerjaan_ayah_id_str'] ?? null,
                     'nama_ibu' => $row['nama_ibu'] ?? null,
                     'pekerjaan_ibu_id' => (int)($row['pekerjaan_ibu_id'] ?? 0),
-                    'pekerjaan_ibu_id_str' => $row['pekerjaan_ibu_id_str'] ?? null,
                     'nama_wali' => $row['nama_wali'] ?? null,
                     'pekerjaan_wali_id' => (int)($row['pekerjaan_wali_id'] ?? 0),
-                    'pekerjaan_wali_id_str' => $row['pekerjaan_wali_id_str'] ?? null,
-                    'anak_keberapa' => $row['anak_keberapa'] ?? null,
+                ];
+                
+                $kesehatan = [
+                    'peserta_didik_id' => $pd_id,
                     'tinggi_badan' => (int)($row['tinggi_badan'] ?? 0),
                     'berat_badan' => (int)($row['berat_badan'] ?? 0),
                     'kebutuhan_khusus' => $row['kebutuhan_khusus'] ?? null,
-                    'updated_at' => $now
                 ];
-
+                
                 if ($existing) {
                     $this->db->table($tableName)->where('peserta_didik_id', $pd_id)->update($saveData);
+                    $this->db->table('orang_tua')->where('peserta_didik_id', $pd_id)->update($dataOrtu);
+                    $this->db->table('kesehatan_siswa')->where('peserta_didik_id', $pd_id)->update($kesehatan);
+                    if($row['nomor_telepon_rumah'] || $row['nomor_telepon_seluler'] || $row['email']){
+                        $this->db->table('alamat_siswa')->where('peserta_didik_id', $pd_id)->update($contact);
+                    }
                     $updated++;
+
                 } else {
                     $saveData['created_at'] = $now;
                     $this->db->table($tableName)->insert($saveData);
+                    $this->db->table('orang_tua')->insert($dataOrtu);
+                    $this->db->table('kesehatan_siswa')->insert($kesehatan);
+                    if($row['nomor_telepon_rumah'] || $row['nomor_telepon_seluler'] || $row['email']){
+                        $this->db->table('alamat_siswa')->insert($contact);
+                    }
                     $saved++;
                 }
             } // End Foreach
@@ -442,83 +465,6 @@ class DapodikModel extends Model
     {
         return $this->db->table('rombel')->truncate();
     }
-
-    // public function saveRombelAnggotaFromDapodik(array $dataAnggota)
-    // {
-    //     $saved   = 0;
-    //     $updated = 0;
-    //     $now     = date('Y-m-d H:i:s');
-    //     $table   = 'anggota_rombel';
-
-    //     if (empty($dataAnggota)) {
-    //         return [
-    //             'success' => false,
-    //             'message' => 'Data Anggota Rombel kosong.'
-    //         ];
-    //     }
-
-    //     // $this->db->transStart();
-
-    //     try {
-    //         foreach ($dataAnggota as $row) {
-    //         $rombel_id   = $row['rombongan_belajar_id'];
-    //         $anggotaList = $row['anggota_rombel'];
-
-    //             foreach ($anggotaList as $anggota) {
-    //                 $anggota_id = $anggota['anggota_rombel_id'];
-    //                 $pd_id      = $anggota['peserta_didik_id'];
-
-    //                 // Cek apakah data sudah ada
-    //                 $existing = $this->db->table($table)
-    //                     ->where('anggota_rombel_id', $anggota_id)
-    //                     ->get()
-    //                     ->getRow();
-
-    //                 $saveData = [
-    //                     'anggota_rombel_id'        => $anggota_id,
-    //                     'peserta_didik_id'         => $pd_id,
-    //                     'rombongan_belajar_id'     => $rombel_id,
-    //                     'jenis_pendaftaran_id'     => $anggota['jenis_pendaftaran_id'],
-    //                     'jenis_pendaftaran_id_str' => $anggota['jenis_pendaftaran_id_str'],
-    //                     'updated_at'               => $now
-    //                 ];
-
-    //                 if ($existing) {
-    //                     $this->db->table($table)
-    //                         ->where('anggota_rombel_id', $anggota_id)
-    //                         ->update($saveData);
-    //                     $updated++;
-    //                 } else {
-    //                     $saveData['created_at'] = $now;
-    //                     $this->db->table($table)->insert($saveData);
-    //                     $saved++;
-    //                 }
-    //             }
-    //         }
-
-    //         // $this->db->transComplete();
-
-    //         // if ($this->db->transStatus() === false) {
-    //         //     throw new \Exception('Transaksi database gagal saat menyimpan Anggota Rombel.');
-    //         // }
-
-    //         return [
-    //             'success' => true,
-    //             'rombel_saved'   => $saved,
-    //             'rombel_updated' => $updated,
-    //             'total'   => $saved + $updated
-    //         ];
-
-    //     } catch (\Exception $e) {
-    //         $this->db->transRollback();
-    //         log_message('error', 'Anggota Rombel Save Exception: ' . $e->getMessage());
-    //         return [
-    //             'success' => false,
-    //             // 'message' => $dataAnggota
-    //             'message' => $e->getMessage()
-    //         ];
-    //     }
-    // }
 
     public function saveRombelAnggotaFromDapodik(array $dataRombel)
     {
@@ -688,6 +634,9 @@ class DapodikModel extends Model
         $data = $builder->get()->getResult();
 
         $tr = '';
+        if(empty($data)){
+            $tr .= "<tr><td colspan='8' class='text-white bg-danger text-center h4'> DATA SISWA KOSONG, SILAHKAN TARIK DATA </td></tr>";
+        }
         $i = 1;
         foreach ($data as $row) {
             $jk = $row->jenis_kelamin==="L"?"Laki-laki":"Perempuan";
@@ -700,8 +649,7 @@ class DapodikModel extends Model
                             <td>".$row->kelas."</td>
                             <td><span class='badge bg-success'>Aktif</span></td>
                             <td>
-                                <a href='#' class='btn btn-sm btn-info text-white me-1' title='Lihat Detail'><i class='fas fa-eye'></i></a>
-                                <a href='#' class='btn btn-sm btn-warning me-1' title='Edit Data'><i class='fas fa-edit'></i></a>
+                                <a href='".base_url('dapodik/detail_siswa/'.$row->nisn)."' class='btn btn-sm btn-info text-white me-1' title='Lihat Detail'><i class='fas fa-eye'></i></a>
                                 <button class='btn btn-sm btn-danger' title='Hapus Data'><i class='fas fa-trash-alt'></i></button>
                             </td>
                         </tr>    ";
@@ -710,6 +658,24 @@ class DapodikModel extends Model
         return [
             'data' => $tr,
             'total' => count($data)
+        ];
+    }
+
+    public function getSiswa($nisn)
+    {
+        $pd_id = $this->db->table('pd')->where('nisn',$nisn)->get()->getRow();
+        $siswa = $this->db->table('pd')
+                    ->join('alamat_siswa','alamat_siswa.peserta_didik_id = pd.peserta_didik_id', 'left')
+                    ->join('orang_tua','orang_tua.peserta_didik_id = pd.peserta_didik_id','left')
+                    ->join('kesehatan_siswa','kesehatan_siswa.peserta_didik_id = pd.peserta_didik_id','left')
+                    ->join('hobi_cita','hobi_cita.peserta_didik_id = pd.peserta_didik_id','left')
+                    ->where('pd.peserta_didik_id', $pd_id->peserta_didik_id)
+                    ->get()
+                    ->getRow();
+        $kasus = $this->db->table('kasus_siswa')->where('peserta_didik_id', $pd_id->peserta_didik_id)->get()->getResult();
+        return [
+          'siswa' => $siswa,
+          'kasus' => $kasus  
         ];
     }
 }
