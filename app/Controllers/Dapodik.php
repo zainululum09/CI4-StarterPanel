@@ -14,11 +14,14 @@ class Dapodik extends BaseController
 
     public function index()
     {
-        $tr = $this->dapodikModel->getAllPd();
+        $page = $this->request->getGet('page') ?? 1;
+        $tr = $this->dapodikModel->getAllPd($page);
         $data = array_merge($this->data, [
             'title'         => 'Daftar Peserta Didik',
             'datasiswa'     => $tr['data'],
-            'total'         => $tr['total']
+            'totalRows' => $tr['totalRows'],
+            'currentPage' => $tr['currentPage'],
+            'perPage'   => $tr['perPage']
         ]);
         return view('pages/commons/peserta_didik', $data);
     }

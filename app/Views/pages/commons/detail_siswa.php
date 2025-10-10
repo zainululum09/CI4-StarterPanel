@@ -87,10 +87,11 @@
                 <div class="tab-pane fade" id="ortu-data" role="tabpanel">
                     <table class="table table-sm">
                         <tr><th style="width: 25%;"><i class="fas fa-male me-2"></i> Nama Ayah</th><td><?= $siswa->nama_ayah ?? '-' ?></td></tr>
-                        <tr><th><i class="fas fa-briefcase me-2"></i> Pekerjaan Ayah</th><td><?= $siswa->pekerjaan_ayah_id ?? '-' ?></td></tr>
+                        <tr><th><i class="fas fa-briefcase me-2"></i> Pekerjaan Ayah</th><td><?= job($siswa->pekerjaan_ayah_id) ?? '-' ?></td></tr>
                         <tr><th><i class="fas fa-female me-2"></i> Nama Ibu</th><td><?= $siswa->nama_ibu ?? '-' ?></td></tr>
-                        <tr><th><i class="fas fa-briefcase me-2"></i> Pekerjaan Ibu</th><td><?= $siswa->pekerjaan_ibu_id ?? '-' ?></td></tr>
+                        <tr><th><i class="fas fa-briefcase me-2"></i> Pekerjaan Ibu</th><td><?= job($siswa->pekerjaan_ibu_id) ?? '-' ?></td></tr>
                         <tr><th><i class="fas fa-user-tie me-2"></i> Nama Wali</th><td><?= $siswa->nama_wali ?? '-' ?></td></tr>
+                        <tr><th><i class="fas fa-briefcase me-2"></i> Pekerjaan Wali</th><td><?= job($siswa->pekerjaan_wali_id) ?? '-' ?></td></tr>
                     </table>
                 </div>
 

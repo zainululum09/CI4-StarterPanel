@@ -112,8 +112,10 @@ class Tarik_dapo extends BaseController
                     'url' => "http://$url:5774/WebService",
                     'npsn' => $config['npsn'] ?? '',
                     'response_time' => $responseTime,
-                    'server_info' => 'Dapodik Web Service',
-                    'data_count' => count($result['data'])
+                    'server_info' => $config['nama_config'],
+                    'data_count' => count($result['data']),
+                    'ip'    => $url,
+                    'my_ip' => gethostbyname(gethostname())
                 ]);
             } else {
                 return $this->response->setJSON([
@@ -280,13 +282,14 @@ class Tarik_dapo extends BaseController
     {
         try {
             $data = [
+                'id' => $this->request->getPost('id'),
                 'nama_config' => $this->request->getPost('nama_config'),
                 'api_url' => $this->request->getPost('api_url'),
                 'api_token' => $this->request->getPost('api_token'),
                 'npsn' => $this->request->getPost('npsn')
             ];
             
-            $result = $this->dapodikModel->saveConfig($data);
+            $result = $this->dapodikModel->updateConfig($data);
             
             if ($result) {
                 return $this->response->setJSON([

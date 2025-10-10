@@ -13,6 +13,9 @@
             </div>
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-center mb-3">
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#configDapodikModal">
+                        <i class="fas fa-sliders-h"></i> Atur Konfigurasi Dapodik
+                    </button>
                     <button class="btn btn-warning" onclick="testConnection()">
                         <i class="fas fa-wifi me-2"></i>
                         <span class="btn-text">Test Koneksi Dapodik</span>
@@ -256,6 +259,63 @@
         </div>
     </div>
 
+    <div class="modal fade" id="configDapodikModal" tabindex="-1" aria-labelledby="configDapodikModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                
+                <div class="modal-header bg-danger">
+                    <h5 class="modal-title text-white" id="configDapodikModalLabel">
+                        <i class="fas fa-cogs"></i> Konfigurasi Tarik Data Dapodik
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                
+                <form id="formDapodikConfig" action="<?= base_url('tarik-dapo/config/save') ?>" method="POST">
+                    <input type="hidden" id="config_id" name="id" value="">
+                    <div class="modal-body">
+                        
+                        <div class="row mb-3 align-items-center">
+                            <label for="nama_config" class="col-sm-4 col-form-label">Nama Konfigurasi</label>
+                            <div class="col-sm-8">
+                                <input type="text" class="form-control" id="nama_config" name="nama_config" required>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3 align-items-center">
+                            <label for="api_url" class="col-sm-4 col-form-label">IP Dapodik Server</label>
+                            <div class="col-sm-8">
+                                <input type="text" class="form-control" id="api_url" name="api_url" required>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3 align-items-center">
+                            <label for="api_token" class="col-sm-4 col-form-label">Token/Kunci API</label>
+                            <div class="col-sm-8">
+                                <input type="text" class="form-control" id="api_token" name="api_token" required>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3 align-items-center">
+                            <label for="npsn" class="col-sm-4 col-form-label">NPSN</label>
+                            <div class="col-sm-8">
+                                <input type="text" class="form-control" id="npsn" name="npsn" required>
+                            </div>
+                        </div>
+
+                    </div>
+                    
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                        <button type="submit" class="btn btn-success" id="btnSaveConfig">
+                            <i class="fas fa-save"></i> Simpan
+                        </button>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+
     <script>
         // Base URL untuk API - sesuaikan dengan konfigurasi Anda
         const baseUrl = '<?= base_url('tarik-dapo'); ?>'; // Menggunakan base_url() helper CodeIgniter 4
@@ -303,9 +363,10 @@
                             html: `
                                 <div class="text-start">
                                     <p><strong>Status:</strong> Terhubung ke server Dapodik</p>
-                                    <p><strong>URL:</strong> ${response.url || 'N/A'}</p>
-                                    <p><strong>Response Time:</strong> ${response.response_time || 'N/A'}ms</p>
                                     <p><strong>Server Info:</strong> ${response.server_info || 'N/A'}</p>
+                                    <p><strong>IP Server Dapodik:</strong> ${response.ip || 'N/A'}</p>
+                                    <p><strong>IP Local:</strong> ${response.my_ip || 'N/A'}</p>
+                                    <p><strong>Response Time:</strong> ${response.response_time || 'N/A'}ms</p>
                                 </div>
                             `,
                             confirmButtonText: 'OK',
@@ -518,5 +579,111 @@
                 }
             });
         }
+
+        // Tangkap event ketika modal Konfigurasi Dapodik selesai ditampilkan
+        $('#configDapodikModal').on('shown.bs.modal', function () {
+            
+            const apiUrl =`${baseUrl}/config`; // Ganti dengan URL endpoint getConfig() Anda
+
+            // 1. Bersihkan formulir terlebih dahulu
+            $('#formDapodikConfig')[0].reset();
+            
+            // 2. Panggil API untuk mengambil data konfigurasi
+            $.ajax({
+                url: apiUrl,
+                method: 'GET',
+                dataType: 'json',
+                beforeSend: function() {
+                    // Tampilkan loading spinner jika perlu
+                    console.log("Mengambil data konfigurasi...");
+                },
+                success: function(response) {
+                    if (response.success && response.data) {
+                        const config = response.data;
+                        
+                        // 3. Isi field formulir dengan data yang diterima
+                        // Pastikan ID field di modal Anda sesuai dengan key data (nama_config, ip_dapodik, token_dapodik, npsn)
+                        $('#config_id').val(config.id);
+                        $('#nama_config').val(config.nama_config);
+                        $('#api_url').val(config.api_url);
+                        $('#api_token').val(config.api_token);
+                        $('#npsn').val(config.npsn);
+                        
+                        console.log("Data konfigurasi berhasil dimuat.");
+                        
+                    } else if (response.success && !response.data) {
+                        // Jika success=true tapi data kosong (misal, belum ada config tersimpan)
+                        console.log("Belum ada konfigurasi yang tersimpan. Biarkan formulir kosong.");
+                    } else {
+                        // Jika success=false (terjadi exception di Controller)
+                        alert('Gagal memuat data konfigurasi: ' + response.message);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error("Kesalahan AJAX:", status, error);
+                    alert("Terjadi kesalahan saat menghubungi server.");
+                }
+            });
+        });
+
+        // Tangani event pengiriman formulir
+        $('#formDapodikConfig').submit(function(e) {
+            e.preventDefault(); 
+            
+            const form = $(this);
+            const btn = $('#btnSaveConfig');
+            const originalText = btn.html();
+
+            // Tampilkan loading state pada tombol
+            btn.html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Menyimpan...').prop('disabled', true);
+
+            $.ajax({
+                url: form.attr('action'),
+                method: form.attr('method'),
+                data: form.serialize(),
+                dataType: 'json',
+                success: function(response) {
+                    if (response.success) {
+                        
+                        // 1. Tampilkan SweetAlert (Swal) Success
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Berhasil!',
+                            text: response.message, // Menggunakan pesan dari Controller
+                            showConfirmButton: false,
+                            timer: 2000 // Notifikasi akan hilang setelah 2 detik
+                        }).then(() => {
+                            // 2. Sembunyikan modal dan Reload halaman
+                            $('#configDapodikModal').modal('hide');
+                            window.location.reload(); 
+                        });
+                        
+                    } else {
+                        // Tampilkan SweetAlert untuk kegagalan (misalnya validasi gagal)
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Gagal Menyimpan!',
+                            text: response.message,
+                            footer: 'Periksa kembali data yang Anda masukkan.'
+                        });
+                        console.error('Validation/System Errors:', response.errors);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    // Tangani kesalahan koneksi (misalnya HTTP 500, 404)
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Kesalahan Jaringan!',
+                        text: 'Terjadi kesalahan koneksi saat menyimpan. Silakan coba lagi.'
+                    });
+                    console.error("AJAX Error:", xhr.responseText);
+                },
+                complete: function() {
+                    // Kembalikan tombol ke keadaan semula setelah operasi selesai
+                    btn.html(originalText).prop('disabled', false);
+                    // Catatan: Jika success, tombol ini akan di-reload, jadi ini hanya untuk kasus error.
+                }
+            });
+        });
     </script>
 <?= $this->endSection(); ?>

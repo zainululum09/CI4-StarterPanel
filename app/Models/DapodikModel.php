@@ -19,16 +19,16 @@ class DapodikModel extends Model
         return $this->where('aktif', 1)->first();
     }
     
-    public function updateConfig($id, $data)
+    public function updateConfig($data)
     {
-        return $this->update($id, $data);
-    }
-    
-    public function saveConfig($data)
-    {
-        $this->set('aktif', 0)->update();
-        $data['aktif'] = 1;
-        return $this->insert($data);
+        unset($data['id']);
+        $this->db->table('config_dapodik')->where('id', 1)->update($data);
+        if ($this->db->affectedRows() === 0) {
+         $data['id'] = 1;
+         return $this->db->table('config_dapodik')->insert($data);
+        }
+        
+        return true;
     }
     
     public function getActiveNpsn()
@@ -609,7 +609,7 @@ class DapodikModel extends Model
     }
 
     // getAllPd
-    public function getAllPd()
+    public function getAllPd($currentPage = 1)
     {
         $db = \Config\Database::connect();
         $builder = $db->table('anggota_rombel ar');
@@ -631,17 +631,24 @@ class DapodikModel extends Model
             'inner'
         );
         $builder->orderBy('kelas ASC, nama ASC');
-        $data = $builder->get()->getResult();
+
+        $perPage = 25;
+        $offset = ($currentPage - 1) * $perPage;
+
+        $data = $builder->limit($perPage, $offset)->get()->getResult();
+        $jumlah = $builder->countAllResults();
+        
 
         $tr = '';
         if(empty($data)){
             $tr .= "<tr><td colspan='8' class='text-white bg-danger text-center h4'> DATA SISWA KOSONG, SILAHKAN TARIK DATA </td></tr>";
         }
         $i = 1;
+        $offset+=1;
         foreach ($data as $row) {
             $jk = $row->jenis_kelamin==="L"?"Laki-laki":"Perempuan";
             $tr .= "<tr>
-                            <th scope='row'>".$i++."</th>
+                            <th scope='row'>".$offset++."</th>
                             <td>".$row->nipd."</td>
                             <td>".$row->nisn."</td>
                             <td>".strtoupper($row->nama)."</td>
@@ -657,7 +664,9 @@ class DapodikModel extends Model
 
         return [
             'data' => $tr,
-            'total' => count($data)
+            'totalRows' => $jumlah,
+            'currentPage' => $currentPage,
+            'perPage'   => $perPage
         ];
     }
 
