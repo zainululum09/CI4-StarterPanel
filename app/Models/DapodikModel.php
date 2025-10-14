@@ -611,8 +611,8 @@ class DapodikModel extends Model
     // getAllPd
     public function getAllPd($currentPage = 1)
     {
-        $db = \Config\Database::connect();
-        $builder = $db->table('anggota_rombel ar');
+        // $db = \Config\Database::connect();
+        $builder = $this->db->table('anggota_rombel ar');
         $builder->select('
             pd.nama AS nama, 
             r.nama AS kelas, 
@@ -632,7 +632,7 @@ class DapodikModel extends Model
         );
         $builder->orderBy('kelas ASC, nama ASC');
 
-        $perPage = 25;
+        $perPage = 20;
         $offset = ($currentPage - 1) * $perPage;
 
         $data = $builder->limit($perPage, $offset)->get()->getResult();
@@ -684,7 +684,34 @@ class DapodikModel extends Model
         $kasus = $this->db->table('kasus_siswa')->where('peserta_didik_id', $pd_id->peserta_didik_id)->get()->getResult();
         return [
           'siswa' => $siswa,
-          'kasus' => $kasus  
+          'kasus' => $kasus,
+          'peserta_didik_id' => $pd_id->peserta_didik_id  
         ];
     }
+
+    public function update_detail($type, $post)
+    {
+        $builder = $this->db->table('kesehatan_siswa');
+        $id = $post['kesehatan_id'];
+        if (empty($id)) {
+                // $builder->where('kesehatan_id', $id);
+                $result = $builder->insert($post);
+            } else {
+                $builder->where('kesehatan_id', $id);
+                $result = $builder->update($post);
+            }
+
+            if ($result) {
+                return $this->response->setJSON([
+                    'success' => true,
+                    'message' => $success_msg
+                ]);
+            } else {
+                return $this->response->setStatusCode(500)->setJSON([
+                    'success' => false,
+                    'message' => 'Gagal menyimpan ke database. Mungkin tidak ada perubahan data.'
+                ]);
+            }
+    }
+
 }

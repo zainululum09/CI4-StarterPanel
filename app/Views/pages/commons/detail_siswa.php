@@ -108,6 +108,9 @@
                         <tr><th><i class="fas fa-weight me-2"></i> Berat Badan</th><td><?= $siswa->berat_badan ?? '-' ?> kg</td></tr>
                         <tr><th><i class="fas fa-wheelchair me-2"></i> Kebutuhan Khusus</th><td><?= $siswa->kebutuhan_khusus ?? '-' ?></td></tr>
                     </table>
+                    <button type="button" class="btn btn-sm btn-outline-primary btn-dynamic-edit" data-action="kesehatan"  data-bs-toggle="modal" data-bs-target="#globalEditModal" data-title="Edit Data Kesehatan">
+                        <i class="fas fa-edit"></i> Edit
+                    </button>
                 </div>
 
                 <div class="tab-pane fade" id="kasus-data" role="tabpanel">
@@ -143,4 +146,97 @@
         </div>
     </div>
 </div>
+
+<div class="modal fade" id="globalEditModal" tabindex="-1" aria-labelledby="globalEditModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="globalEditModalLabel">
+                    <i class="fas fa-edit"></i> Edit Data Siswa
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            
+            <div class="modal-body">
+                <div class="text-center" id="modal-loading">
+                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Memuat formulir...
+                </div>
+                <div id="dynamic-form-container">
+                    </div>
+            </div>
+            
+            <div class="modal-footer d-none" id="modal-footer-static">
+                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                 </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+$(document).ready(function() {
+    const CURRENT_SISWA_ID = <?php echo $siswa->nisn; ?>; 
+    const modal = $('#globalEditModal');
+    const modalTitle = $('#globalEditModalLabel');
+    const formContainer = $('#dynamic-form-container');
+    const loadingDiv = $('#modal-loading');
+
+    $(document).on('click', '.btn-dynamic-edit', function() {
+        const actionType = $(this).data('action');
+        const title = $(this).data('title'); 
+        const apiUrl = '/dapodik/get_form/' + actionType + '/' + CURRENT_SISWA_ID; 
+
+        modalTitle.html('<i class="fas fa-edit"></i> ' + title);
+        formContainer.empty().hide();
+        loadingDiv.show();
+        modal.modal('show');
+
+        $.ajax({
+            url: apiUrl,
+            method: 'GET',
+            success: function(response) {
+                formContainer.html(response).show();
+                loadingDiv.hide();
+            },
+            error: function() {
+                formContainer.html('<div class="alert alert-danger">Gagal memuat formulir.</div>').show();
+                loadingDiv.hide();
+            }
+        });
+    });
+
+    formContainer.on('submit', 'form', function(e) {
+        e.preventDefault(); 
+        const form = $(this);
+        const btn = $('#btnSaveDynamic');
+        const originalText = btn.html();
+
+        btn.html('<span class="spinner-border spinner-border-sm"></span> Menyimpan...').prop('disabled', true);
+
+        $.ajax({
+            url: form.attr('action'),
+            method: 'post', 
+            data: form.serialize(),
+            dataType: 'json',
+            success: function(response) {
+                if (response.success) {
+                    Swal.fire('Berhasil!', response.message, 'success').then(() => {
+                        modal.modal('hide');
+                        window.location.reload(); 
+                    });
+                } else {
+                    Swal.fire('Gagal!', response.message, 'error');
+                }
+            },
+            error: function() {
+                Swal.fire('Error', 'Terjadi kesalahan koneksi saat menyimpan.', 'error');
+            },
+            complete: function() {
+                btn.html(originalText).prop('disabled', false);
+            }
+        });
+    });
+});
+</script>
 <?= $this->endSection() ?>

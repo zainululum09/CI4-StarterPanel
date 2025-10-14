@@ -67,3 +67,5 @@ $routes->get('dapodik','Dapodik::index');
 
 // Detail Siswa
 $routes->get('dapodik/detail_siswa/(:segment)', 'Dapodik::detailSiswa/$1');
+$routes->get('dapodik/get_form/(:alpha)/(:num)', 'Dapodik::getForm/$1/$2');
+$routes->post('dapodik/update_data', 'Dapodik::update_data');
