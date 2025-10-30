@@ -53,7 +53,7 @@ class Dapodik extends BaseController
                 case 'kesehatan':
                     $data_kesehatan = $this->dapodikModel->getSiswa($data['siswa_id']); 
                     
-                    $data = [
+                    $data_return = [
                        'data_kesehatan' => $data_kesehatan['siswa'],
                        'peserta_didik_id' => $data_kesehatan['peserta_didik_id'],
                        'form_title' => 'Data Kesehatan Siswa'
@@ -63,19 +63,22 @@ class Dapodik extends BaseController
                     break;
 
                 case 'alamat':
-                    // $data_alamat = $alamatModel->getSiswa($nisn);
+                    $data_alamat = $this->dapodikModel->getSiswa($data['siswa_id']); 
                     
-                    // $data['data_alamat'] = $data_alamat;
-                    // $data['form_title'] = 'Alamat & Kontak Siswa';
+                    $data_return = [
+                       'data_alamat' => $data_alamat['siswa'],
+                       'peserta_didik_id' => $data_alamat['peserta_didik_id'],
+                       'form_title' => 'Data Alamat Siswa'
+                    ];
 
-                    $view_name = 'siswa/_form_alamat';
+                    $view_name = 'components/_form_alamat';
                     break;
                     
                 default:
                     throw new \CodeIgniter\Exceptions\PageNotFoundException('Jenis form tidak valid: ' . $type);
             }
 
-            return view($view_name, $data); 
+            return view($view_name, $data_return); 
 
         } catch (\Exception $e) {
             log_message('error', 'Error loading dynamic form: ' . $e->getMessage());
@@ -114,12 +117,14 @@ class Dapodik extends BaseController
                     $model = $this->dapodikModel; 
                     $validation_rules = $this->getValidationRules('kesehatan');
                     $success_msg = 'Data Kesehatan Siswa berhasil diperbarui.';
+                    $id = $post['kesehatan_id'];
                     break;
 
                 case 'alamat':
-                    $model = $this->alamatModel; 
+                    $model = $this->dapodikModel; 
                     $validation_rules = $this->getValidationRules('alamat');
                     $success_msg = 'Data Alamat & Kontak berhasil diperbarui.';
+                    $id = $post['alamat_id'];
                     break;
                     
                 case 'orang_tua':
@@ -142,21 +147,13 @@ class Dapodik extends BaseController
                     'errors' => $this->validator->getErrors()
                 ]);
             }
-            unset($post['type']); 
-            
-            $data=[
-                "peserta_didik_id" => $post['peserta_didik_id'],
-                "kesehatan_id"  => $post['kesehatan_id'],
-                "tinggi_badan"  => $post['tinggi_badan'],
-                "berat_badan"   => $post['berat_badan'],
-                "kebutuhan_khusus" => $post['kebutuhan_khusus']
-            ];
+            // unset($post['type']); 
 
-            // if (empty($post['kesehatan_id'])) {
-            //     $result = $model->insert($data);
-            // } else {
+            if (empty($id)) {
+                $result = $model->insert($post);
+            } else {
                 $result = $model->update_detail($post);
-            // }
+            }
 
             if ($result) {
                 return $this->response->setJSON([
@@ -192,7 +189,7 @@ class Dapodik extends BaseController
             case 'alamat':
                 return [
                     'peserta_didik_id' => 'required|string',
-                    'alamat_jalan' => 'required|max_length[255]',
+                    'alamat' => 'required|max_length[255]',
                 ];
             default:
                 return [];

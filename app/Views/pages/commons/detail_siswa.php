@@ -1,6 +1,6 @@
 <?= $this->extend('layouts/main'); ?>
 <?= $this->section('content'); ?>
-<h1 class="h3 mb-3"><strong><?= $title.": ". $siswa->nama;?></strong></h1>
+<h1 class="h3 mb-3"><strong><?= $title.": ". strtoupper($siswa->nama);?></strong></h1>
 <div class="container mt-5">
     <div class="card shadow">
         <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
@@ -82,6 +82,9 @@
                         <tr><th><i class="fas fa-mobile-alt me-2"></i> Telepon Seluler</th><td><?= $siswa->telepon_seluler ?? $siswa->telepon_rumah ?? '-' ?></td></tr>
                         <tr><th><i class="fas fa-envelope me-2"></i> Email</th><td><?= $siswa->email ?? '-' ?></td></tr>
                     </table>
+                    <button type="button" class="btn btn-sm btn-outline-primary btn-dynamic-edit" data-action="alamat"  data-bs-toggle="modal" data-bs-target="#globalEditModal" data-title="Edit Data Alamat">
+                        <i class="fas fa-edit"></i> Edit
+                    </button>
                 </div>
 
                 <div class="tab-pane fade" id="ortu-data" role="tabpanel">
@@ -176,7 +179,7 @@
 
 <script>
 $(document).ready(function() {
-    const CURRENT_SISWA_ID = <?php echo $siswa->nisn; ?>; 
+    const CURRENT_SISWA_ID = '<?php echo $siswa->nisn; ?>'; 
     const modal = $('#globalEditModal');
     const modalTitle = $('#globalEditModalLabel');
     const formContainer = $('#dynamic-form-container');
@@ -186,6 +189,11 @@ $(document).ready(function() {
         const actionType = $(this).data('action');
         const title = $(this).data('title'); 
         const apiUrl = '/dapodik/get_form/' + actionType + '/' + CURRENT_SISWA_ID; 
+        if(actionType!=="kesehatan"){
+            $('.modal-dialog').addClass('modal-lg')
+        } else {
+            $('.modal-dialog').removeClass('modal-lg')
+        }
 
         modalTitle.html('<i class="fas fa-edit"></i> ' + title);
         formContainer.empty().hide();

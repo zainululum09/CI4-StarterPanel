@@ -691,21 +691,43 @@ class DapodikModel extends Model
 
     public function update_detail($post)
     {
-        $builder = $this->db->table('kesehatan_siswa');
-        $id = $post['kesehatan_id'];
-        if (empty($id)) {
-                // $builder->where('kesehatan_id', $id);
-                $result = $builder->insert($post);
-            } else {
-                $builder->where('kesehatan_id', $id);
-                $result = $builder->update($post);
-            }
-
-            if ($result) {
-                return ['status' => 'success', 'message' => 'Data berhasil diupdate'];
-            } else {
-                return ['status' => 'error', 'message' => 'Tidak ada perubahan'];
-            }
+        switch ($post['type']){
+            case 'kesehatan':
+                unset($post['type']);
+                $builder = $this->db->table('kesehatan_siswa');
+                $id = $post['kesehatan_id'];
+                if (empty($id)) {
+                    $result = $builder->insert($post);
+                } else {
+                    $builder->where('kesehatan_id', $id);
+                    $result = $builder->update($post);
+                }
+                
+                if ($result) {
+                    return ['status' => 'success', 'message' => 'Data berhasil diupdate'];
+                } else {
+                    return ['status' => 'error', 'message' => 'Tidak ada perubahan'];
+                }
+            break;
+            
+            case 'alamat':                
+                unset($post['type']);
+                $builder = $this->db->table('alamat_siswa');
+                $id = $post['alamat_id'];
+                if (empty($id)) {
+                    $result = $builder->insert($post);
+                } else {
+                    $builder->where('alamat_id', $id);
+                    $result = $builder->update($post);
+                }
+                
+                if ($result) {
+                    return ['status' => 'success', 'message' => 'Data berhasil diupdate'];
+                } else {
+                    return ['status' => 'error', 'message' => 'Tidak ada perubahan'];
+                }
+            break;
+        }
     }
 
 }
