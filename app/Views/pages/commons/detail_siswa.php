@@ -212,11 +212,13 @@ $(document).ready(function() {
         const btn = $('#btnSaveDynamic');
         const originalText = btn.html();
 
+        // console.log("try");
+
         btn.html('<span class="spinner-border spinner-border-sm"></span> Menyimpan...').prop('disabled', true);
 
         $.ajax({
             url: form.attr('action'),
-            method: 'post', 
+            method: 'POST', 
             data: form.serialize(),
             dataType: 'json',
             success: function(response) {

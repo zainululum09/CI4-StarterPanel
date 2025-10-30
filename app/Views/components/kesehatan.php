@@ -1,6 +1,6 @@
 <form id="formUpdateKesehatan" action="<?= base_url('dapodik/update_data'); ?>" method="post">
 
-    <input type="hidden" name="type" value="kesehatan">
+    <input type="hidden" name="type" value="kesehatan" id="type">
     <input type="hidden" name="peserta_didik_id" value="<?= $peserta_didik_id ?? ''; ?>">
     <input type="hidden" name="kesehatan_id" value="<?= $data_kesehatan->kesehatan_id ?? ''; ?>">
     

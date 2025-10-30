@@ -47,7 +47,7 @@ class Dapodik extends BaseController
             'siswa_id' => $nisn,
             'action_url' => base_url('siswa/update_' . $type)
         ];
-
+        
         try {
             switch ($type) {
                 case 'kesehatan':
@@ -91,15 +91,15 @@ class Dapodik extends BaseController
 
     public function update_data()
     {
-        if ($this->request->getMethod() !== 'post') {
+        if ($this->request->getMethod() !== 'POST') {
             return $this->response->setStatusCode(405)->setJSON([
                 'success' => false, 
                 'message' => 'Metode request tidak diizinkan.'
             ]);
         }
-
+        
         $post = $this->request->getPost();
-        $type = $post['type'] ?? null; 
+        $type = $post['type'] ?? null;
         
         if (!$type) {
             return $this->response->setStatusCode(400)->setJSON([
@@ -111,7 +111,7 @@ class Dapodik extends BaseController
         try {
             switch ($type) {
                 case 'kesehatan':
-                    $model = $this->dapodikModel->update_detail('kesehatan',$post); 
+                    $model = $this->dapodikModel; 
                     $validation_rules = $this->getValidationRules('kesehatan');
                     $success_msg = 'Data Kesehatan Siswa berhasil diperbarui.';
                     break;
@@ -143,24 +143,32 @@ class Dapodik extends BaseController
                 ]);
             }
             unset($post['type']); 
+            
+            $data=[
+                "peserta_didik_id" => $post['peserta_didik_id'],
+                "kesehatan_id"  => $post['kesehatan_id'],
+                "tinggi_badan"  => $post['tinggi_badan'],
+                "berat_badan"   => $post['berat_badan'],
+                "kebutuhan_khusus" => $post['kebutuhan_khusus']
+            ];
 
             // if (empty($post['kesehatan_id'])) {
-            //     $result = $model->insert($post);
+            //     $result = $model->insert($data);
             // } else {
-            //     $result = $model->update($post['kesehatan_id'], $post);
+                $result = $model->update_detail($post);
             // }
 
-            // if ($result) {
-            //     return $this->response->setJSON([
-            //         'success' => true,
-            //         'message' => $success_msg
-            //     ]);
-            // } else {
-            //     return $this->response->setStatusCode(500)->setJSON([
-            //         'success' => false,
-            //         'message' => 'Gagal menyimpan ke database. Mungkin tidak ada perubahan data.'
-            //     ]);
-            // }
+            if ($result) {
+                return $this->response->setJSON([
+                    'success' => true,
+                    'message' => $success_msg
+                ]);
+            } else {
+                return $this->response->setStatusCode(500)->setJSON([
+                    'success' => false,
+                    'message' => 'Gagal menyimpan ke database. Mungkin tidak ada perubahan data.'
+                ]);
+            }
 
         } catch (\Exception $e) {
             log_message('error', 'Update data error: ' . $e->getMessage());
@@ -176,14 +184,14 @@ class Dapodik extends BaseController
         switch ($type) {
             case 'kesehatan':
                 return [
-                    'siswa_id' => 'required|integer',
+                    'peserta_didik_id' => 'required|string',
                     'tinggi_badan' => 'required|integer|greater_than[0]',
                     'berat_badan' => 'required|integer|greater_than[0]',
                     'kebutuhan_khusus' => 'required|max_length[50]',
                 ];
             case 'alamat':
                 return [
-                    'siswa_id' => 'required|integer',
+                    'peserta_didik_id' => 'required|string',
                     'alamat_jalan' => 'required|max_length[255]',
                 ];
             default:

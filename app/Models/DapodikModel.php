@@ -689,7 +689,7 @@ class DapodikModel extends Model
         ];
     }
 
-    public function update_detail($type, $post)
+    public function update_detail($post)
     {
         $builder = $this->db->table('kesehatan_siswa');
         $id = $post['kesehatan_id'];
@@ -702,15 +702,9 @@ class DapodikModel extends Model
             }
 
             if ($result) {
-                return $this->response->setJSON([
-                    'success' => true,
-                    'message' => $success_msg
-                ]);
+                return ['status' => 'success', 'message' => 'Data berhasil diupdate'];
             } else {
-                return $this->response->setStatusCode(500)->setJSON([
-                    'success' => false,
-                    'message' => 'Gagal menyimpan ke database. Mungkin tidak ada perubahan data.'
-                ]);
+                return ['status' => 'error', 'message' => 'Tidak ada perubahan'];
             }
     }
 
