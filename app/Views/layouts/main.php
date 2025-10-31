@@ -22,7 +22,7 @@
 	
 </head>
 
-<body data-theme="light">
+<body data-theme="dark">
 	<div class="wrapper">
 		<?= $this->include('layouts/sidebar'); ?>
 		<div class="main">
