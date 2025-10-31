@@ -141,10 +141,11 @@ class Dapodik extends BaseController
                     $id = $post['alamat_id'];
                     break;
                     
-                case 'orang_tua':
-                    $model = $this->orangTuaModel; 
-                    $validation_rules = $this->getValidationRules('orang_tua');
+                case 'orangtua':
+                    $model = $this->dapodikModel;                     
+                    $validation_rules = $this->getValidationRules('orangtua');
                     $success_msg = 'Data Orang Tua berhasil diperbarui.';
+                    $id = $post['ortu_id'];
                     break;
 
                 default:
@@ -205,8 +206,12 @@ class Dapodik extends BaseController
                     'peserta_didik_id' => 'required|string',
                     'alamat' => 'required|max_length[255]',
                 ];
-            default:
-                return [];
+            case 'orangtua':
+                return [
+                    'nama_ayah' => 'required|string',
+                    'nama_ibu' => 'required|string',
+                    'nama_wali' => 'string',
+                ];
         }
     }
 

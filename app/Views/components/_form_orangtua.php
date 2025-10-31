@@ -22,6 +22,13 @@
         </div>
         
         <div class="col-sm-3">
+            <label for="telepon_ayah" class="form-label">No. Telepon Ayah</label>
+        </div>
+        <div class="col-sm-8"> 
+            <input id="telepon_ayah" type="text" class="form-control" name="telepon_ayah" value="<?= $data_orangtua->telepon_ayah ?? ''; ?>">
+        </div>
+        
+        <div class="col-sm-3">
             <label for="nama_ibu" class="form-label">Nama Ibu</label>
         </div>
         <div class="col-sm-8"> 
@@ -35,6 +42,12 @@
             <select name="pekerjaan_ibu_id" class="form-select" id="pekerjaan_ibu_id">
                 <option value="<?= $data_orangtua->pekerjaan_ibu_id ?? '' ?>" selected> <?= job($data_orangtua->pekerjaan_ibu_id) ?? '= Pilih Pekerjaan Ibu ='?></option>
             </select>
+        </div>
+        <div class="col-sm-3">
+            <label for="telepon_ibu" class="form-label">No. Telepon Ibu</label>
+        </div>
+        <div class="col-sm-8"> 
+            <input id="telepon_ibu" type="text" class="form-control" name="telepon_ibu" value="<?= $data_orangtua->telepon_ibu ?? ''; ?>">
         </div>
         
         <div class="col-sm-3">
@@ -51,6 +64,12 @@
             <select name="pekerjaan_wali_id" class="form-select" id="pekerjaan_wali_id">
                 <option value="<?= $data_orangtua->pekerjaan_wali_id ?? '' ?>" selected> <?= job($data_orangtua->pekerjaan_wali_id) ?? '= Pilih Pekerjaan Wali ='?></option>
             </select>
+        </div>
+        <div class="col-sm-3">
+            <label for="telepon_wali" class="form-label">No. Telepon Wali</label>
+        </div>
+        <div class="col-sm-8"> 
+            <input id="telepon_wali" type="text" class="form-control" name="telepon_wali" value="<?= $data_orangtua->telepon_wali ?? ''; ?>">
         </div>
     </div>
         

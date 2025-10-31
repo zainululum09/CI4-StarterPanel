@@ -91,10 +91,13 @@
                     <table class="table table-sm">
                         <tr><th style="width: 25%;"><i class="fas fa-male me-2"></i> Nama Ayah</th><td><?= $siswa->nama_ayah ?? '-' ?></td></tr>
                         <tr><th><i class="fas fa-briefcase me-2"></i> Pekerjaan Ayah</th><td><?= job($siswa->pekerjaan_ayah_id) ?? '-' ?></td></tr>
+                        <tr><th><i class="fas fa-mobile-alt me-2"></i> No. Telepon Ayah</th><td><?= $siswa->telepon_ayah ?? '-' ?></td></tr>
                         <tr><th><i class="fas fa-female me-2"></i> Nama Ibu</th><td><?= $siswa->nama_ibu ?? '-' ?></td></tr>
                         <tr><th><i class="fas fa-briefcase me-2"></i> Pekerjaan Ibu</th><td><?= job($siswa->pekerjaan_ibu_id) ?? '-' ?></td></tr>
+                        <tr><th><i class="fas fa-mobile-alt me-2"></i> No. Telepon Ibu</th><td><?= $siswa->telepon_ibu ?? '-' ?></td></tr>
                         <tr><th><i class="fas fa-user-tie me-2"></i> Nama Wali</th><td><?= $siswa->nama_wali ?? '-' ?></td></tr>
                         <tr><th><i class="fas fa-briefcase me-2"></i> Pekerjaan Wali</th><td><?= job($siswa->pekerjaan_wali_id) ?? '-' ?></td></tr>
+                        <tr><th><i class="fas fa-mobile-alt me-2"></i> No. Telepon Wali</th><td><?= $siswa->telepon_wali ?? '-' ?></td></tr>
                     </table>
                     <button type="button" class="btn btn-sm btn-outline-primary btn-dynamic-edit" data-action="orangtua"  data-bs-toggle="modal" data-bs-target="#globalEditModal" data-title="Edit Data Orangtua">
                         <i class="fas fa-edit"></i> Edit
