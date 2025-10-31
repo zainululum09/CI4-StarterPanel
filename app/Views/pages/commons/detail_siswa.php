@@ -188,7 +188,8 @@ $(document).ready(function() {
     $(document).on('click', '.btn-dynamic-edit', function() {
         const actionType = $(this).data('action');
         const title = $(this).data('title'); 
-        const apiUrl = '/dapodik/get_form/' + actionType + '/' + CURRENT_SISWA_ID; 
+        const apiUrl = '/dapodik/get_form/' + actionType + '/' + CURRENT_SISWA_ID;
+        const urlWil = '/dapodik/getProvinces'; 
         if(actionType!=="kesehatan"){
             $('.modal-dialog').addClass('modal-lg')
         } else {
@@ -212,6 +213,7 @@ $(document).ready(function() {
                 loadingDiv.hide();
             }
         });
+        
     });
 
     formContainer.on('submit', 'form', function(e) {
@@ -219,6 +221,7 @@ $(document).ready(function() {
         const form = $(this);
         const btn = $('#btnSaveDynamic');
         const originalText = btn.html();
+        const prov = $('#provinsi').html();
 
         // console.log("try");
 
@@ -246,7 +249,9 @@ $(document).ready(function() {
                 btn.html(originalText).prop('disabled', false);
             }
         });
+
     });
+
 });
 </script>
 <?= $this->endSection() ?>

@@ -68,4 +68,8 @@ $routes->get('dapodik','Dapodik::index');
 // Detail Siswa
 $routes->get('dapodik/detail_siswa/(:segment)', 'Dapodik::detailSiswa/$1');
 $routes->get('dapodik/get_form/(:alpha)/(:num)', 'Dapodik::getForm/$1/$2');
+$routes->get('dapodik/getProvinces', 'Dapodik::getProvinces');
+$routes->get('dapodik/getRegencies/(:segment)', 'Dapodik::getRegencies/$1');
+$routes->get('dapodik/getDistricts/(:segment)', 'Dapodik::getDistricts/$1');
+$routes->get('dapodik/getVillages/(:segment)', 'Dapodik::getVillages/$1');
 $routes->post('dapodik/update_data', 'Dapodik::update_data');
