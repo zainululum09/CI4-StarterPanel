@@ -96,6 +96,9 @@
                         <tr><th><i class="fas fa-user-tie me-2"></i> Nama Wali</th><td><?= $siswa->nama_wali ?? '-' ?></td></tr>
                         <tr><th><i class="fas fa-briefcase me-2"></i> Pekerjaan Wali</th><td><?= job($siswa->pekerjaan_wali_id) ?? '-' ?></td></tr>
                     </table>
+                    <button type="button" class="btn btn-sm btn-outline-primary btn-dynamic-edit" data-action="orangtua"  data-bs-toggle="modal" data-bs-target="#globalEditModal" data-title="Edit Data Orangtua">
+                        <i class="fas fa-edit"></i> Edit
+                    </button>
                 </div>
 
                 <div class="tab-pane fade" id="hobi-data" role="tabpanel">

@@ -75,6 +75,18 @@ class Dapodik extends BaseController
 
                     $view_name = 'components/_form_alamat';
                     break;
+                
+                case 'orangtua':
+                    $data_orangtua = $this->dapodikModel->getSiswa($data['siswa_id']); 
+                    
+                    $data_return = [
+                       'data_orangtua' => $data_orangtua['siswa'],
+                       'peserta_didik_id' => $data_orangtua['peserta_didik_id'],
+                       'form_title' => 'Data Orangtua Siswa'
+                    ];
+
+                    $view_name = 'components/_form_orangtua';
+                    break;
                     
                 default:
                     throw new \CodeIgniter\Exceptions\PageNotFoundException('Jenis form tidak valid: ' . $type);
