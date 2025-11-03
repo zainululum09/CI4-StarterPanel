@@ -5,9 +5,9 @@
     <div class="card shadow">
         <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
             <h4 class="mb-0"><i class="fas fa-user-circle me-2"></i> Biodata</h4>
-            <a href="/siswa/edit/<?= $siswa->peserta_didik_id ?>" class="btn btn-warning btn-sm" title="Edit Data Siswa">
-                <i class="fas fa-edit me-1"></i> Edit
-            </a>
+            <button type="button" class="btn btn-sm btn-outline-light btn-dynamic-edit" data-action="biodata"  data-bs-toggle="modal" data-bs-target="#globalEditModal" data-title="Edit Biodata Siswa">
+                <i class="fas fa-edit"></i> Edit
+            </button>
         </div>
         <div class="card-body">
 
@@ -19,7 +19,7 @@
                     ?>
 
                     <?php if ($foto_tersedia): ?>
-                        <img src="<?= $siswa->foto ?>" 
+                        <img src="<?= $foto ?>" 
                             alt="Foto Siswa: <?= $siswa->nama ?>" 
                             class="img-thumbnail rounded-circle" 
                             style="width: 150px; height: 150px; object-fit: cover;">
@@ -227,16 +227,30 @@ $(document).ready(function() {
         const form = $(this);
         const btn = $('#btnSaveDynamic');
         const originalText = btn.html();
-        const prov = $('#provinsi').html();
+        
+        const dataType = form.find('input[name="type"]').val(); 
+        
+        let ajaxData;
+        let ajaxContentType = 'application/x-www-form-urlencoded; charset=UTF-8';
+        let ajaxProcessData = true;
 
-        // console.log("try");
+        if (dataType === 'biodata') {
+            ajaxData = new FormData(form[0]);
+            ajaxContentType = false; 
+            ajaxProcessData = false; 
+        } else {
+            ajaxData = form.serialize();
+        }
 
         btn.html('<span class="spinner-border spinner-border-sm"></span> Menyimpan...').prop('disabled', true);
 
         $.ajax({
             url: form.attr('action'),
             method: 'POST', 
-            data: form.serialize(),
+            data: ajaxData, 
+            contentType: ajaxContentType,
+            processData: ajaxProcessData,
+
             dataType: 'json',
             success: function(response) {
                 if (response.success) {
@@ -245,7 +259,12 @@ $(document).ready(function() {
                         window.location.reload(); 
                     });
                 } else {
-                    Swal.fire('Gagal!', response.message, 'error');
+                    if (response.errors) {
+                        const errorMessages = Object.values(response.errors).join('<br>');
+                        Swal.fire('Gagal Validasi!', errorMessages, 'error');
+                    } else {
+                        Swal.fire('Gagal!', response.message, 'error');
+                    }
                 }
             },
             error: function() {
@@ -255,9 +274,7 @@ $(document).ready(function() {
                 btn.html(originalText).prop('disabled', false);
             }
         });
-
     });
-
 });
 </script>
 <?= $this->endSection() ?>

@@ -4,6 +4,8 @@ namespace App\Controllers;
 
 use App\Controllers\BaseController;
 use App\Models\DapodikModel;
+use CodeIgniter\HTTP\Files\UploadedFile;
+use CodeIgniter\Files\File;
 
 class Dapodik extends BaseController
 {
@@ -30,14 +32,29 @@ class Dapodik extends BaseController
     {
         $detail = $this->dapodikModel->getSiswa($nisn);
         $provinsi = '$this->getProvinces()';
+        $fotoUrl = base_url('writable/uploads/foto_siswa/'. $detail['siswa']->foto);
         $data = array_merge($this->data, [
             'title' => 'Detail Siswa',
             'siswa' => $detail['siswa'],
+            'foto' => $fotoUrl,
             'kasus' => $detail['kasus'],
             'peserta_didik_id' => $detail['peserta_didik_id'],
             'provinsi' => $provinsi
         ]);
         return view('pages/commons/detail_siswa', $data);
+    }
+
+    public function showImage($filename)
+    {
+        $path = WRITEPATH . 'writable/uploads/foto_siswa/' . $filename;
+        if (! file_exists($path)) {
+            die('Foto tidak ditemukan.'); 
+        }
+        $mimeType = mime_content_type($path);
+        return $this->response
+                    ->setStatusCode(200)
+                    ->setContentType($mimeType)
+                    ->setBody(file_get_contents($path));
     }
 
     public function getForm($type, $nisn)
@@ -87,6 +104,18 @@ class Dapodik extends BaseController
 
                     $view_name = 'components/_form_orangtua';
                     break;
+                
+                case 'biodata':
+                    $data_siswa = $this->dapodikModel->getSiswa($data['siswa_id']); 
+                    
+                    $data_return = [
+                       'data_siswa' => $data_siswa['siswa'],
+                       'peserta_didik_id' => $data_siswa['peserta_didik_id'],
+                       'form_title' => 'Data Orangtua Siswa'
+                    ];
+
+                    $view_name = 'components/_form_biodata';
+                    break;
                     
                 default:
                     throw new \CodeIgniter\Exceptions\PageNotFoundException('Jenis form tidak valid: ' . $type);
@@ -117,6 +146,8 @@ class Dapodik extends BaseController
         
         $post = $this->request->getPost();
         $type = $post['type'] ?? null;
+        $file = null; 
+        $fotoRules = [];
         
         if (!$type) {
             return $this->response->setStatusCode(400)->setJSON([
@@ -147,6 +178,39 @@ class Dapodik extends BaseController
                     $success_msg = 'Data Orang Tua berhasil diperbarui.';
                     $id = $post['ortu_id'];
                     break;
+                
+                case 'biodata':
+                    $model = $this->dapodikModel;                     
+                    $validation_rules = $this->getValidationRules('biodata');
+                    $success_msg = 'Biodata berhasil diperbarui.';
+                    $id = $post['peserta_didik_id'];
+
+                    $validationRule = [
+                        'foto' => [
+                            'label' => 'Image File',
+                            'rules' => [
+                                'uploaded[foto]',
+                                'is_image[foto]',
+                                'mime_in[foto,image/jpg,image/jpeg,image/gif,image/png,image/webp]',
+                                'max_size[foto,2000]',
+                            ],
+                        ],
+                    ];
+                    $validated = $this->validate($validationRule);  
+                    if ($validated) {
+                        $path = 'writable/uploads/foto_siswa';   
+                        $image = $this->request->getFile('foto');  
+                        $filename = $image->getRandomName();
+                        $siswa = $this->dapodikModel->getSiswa($post['nisn']);
+                        $oldFile = $siswa['siswa']->foto;
+                        if($oldFile){
+                            $oldPath = $path. DIRECTORY_SEPARATOR.$oldFile;
+                            @unlink($oldPath);
+                        }
+                        $image->move(ROOTPATH . $path, $filename);  
+                        $post['foto'] = $image->getName();
+                    };  
+                    break;
 
                 default:
                     return $this->response->setStatusCode(400)->setJSON([
@@ -162,12 +226,15 @@ class Dapodik extends BaseController
                     'errors' => $this->validator->getErrors()
                 ]);
             }
-            // unset($post['type']); 
 
             if ($id="") {
                 $result = $model->insert($post);
             } else {
-                $result = $model->update_detail($post);
+                if($type==='biodata'){
+                    $result = $model->update_detail($post, $file);
+                } else {
+                    $result = $model->update_detail($post);
+                }
             }
 
             if ($result) {
@@ -211,6 +278,12 @@ class Dapodik extends BaseController
                     'nama_ayah' => 'required|string',
                     'nama_ibu' => 'required|string',
                     'nama_wali' => 'string',
+                ];
+            case 'biodata':
+                return [
+                    'nama' => 'required|string',
+                    'nisn' => 'required|string',
+                    'nik' => 'required|string',
                 ];
         }
     }

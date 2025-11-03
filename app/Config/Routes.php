@@ -73,3 +73,6 @@ $routes->get('dapodik/getRegencies/(:segment)', 'Dapodik::getRegencies/$1');
 $routes->get('dapodik/getDistricts/(:segment)', 'Dapodik::getDistricts/$1');
 $routes->get('dapodik/getVillages/(:segment)', 'Dapodik::getVillages/$1');
 $routes->post('dapodik/update_data', 'Dapodik::update_data');
+
+//get File
+$routes->get('writable/uploads/foto_siswa/(:segment)', 'Dapodik::showImage/$1');

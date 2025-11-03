@@ -744,6 +744,23 @@ class DapodikModel extends Model
                     return ['status' => 'error', 'message' => 'Tidak ada perubahan'];
                 }
             break;
+            case 'biodata':
+                unset($post['type']);
+                $builder = $this->db->table('pd');
+                $id = $post['peserta_didik_id'];
+                if (empty($id)) {
+                    $result = $builder->insert($post);
+                } else {
+                    $builder->where('peserta_didik_id', $id);
+                    $result = $builder->update($post);
+                }
+                
+                if ($result) {
+                    return ['status' => 'success', 'message' => 'Data berhasil diupdate'];
+                } else {
+                    return ['status' => 'error', 'message' => 'Tidak ada perubahan'];
+                }
+            break;
         }
     }
 
