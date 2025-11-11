@@ -267,7 +267,7 @@ class DapodikModel extends Model
                     'peserta_didik_id' => $pd_id,
                     'registrasi_id' => $row['registrasi_id'] ?? null,
                     'nipd' => $row['nipd'] ?? null,
-                    'tanggal_masuk_sekolah' => $row['tanggal_masuk_sekolah'] ?? null, // DATE
+                    'tanggal_masuk_sekolah' => $row['tanggal_masuk_sekolah'] ?? null,
                     'sekolah_asal' => $row['sekolah_asal'] ?? null,
                     'nama' => $row['nama'] ?? '',
                     'nisn' => $row['nisn'] ?? null,
@@ -418,7 +418,6 @@ class DapodikModel extends Model
                             ->get()->getRow();
 
                         $savePemb = [
-                            'mapel_id' => $pb['pembelajaran_id'],
                             'mata_pelajaran_id' => $pb['mata_pelajaran_id'] ?? null,
                             'nama_mata_pelajaran' => $pb['nama_mata_pelajaran'] ?? null,
                             'updated_at' => $now
@@ -783,6 +782,28 @@ class DapodikModel extends Model
     {
         $builder = $this->db->table('rombel')->orderby('nama','ASC')->get()->getResult();
         return $builder;
+    }
+
+    public function getAnggotaRombel($id)
+    {
+        $builder = $this->db->table('pd')
+                    ->join('anggota_rombel','pd.peserta_didik_id = anggota_rombel.peserta_didik_id', 'inner')
+                    ->orderby('nama','ASC')
+                    ->where('rombongan_belajar_id',$id)
+                    ->get()
+                    ->getResult();
+        return $builder;
+    }
+
+    public function getMapel()
+    {
+        $mapel = $this->db->table('mapel')->get()->getResult();
+        return $mapel;
+    }
+
+    public function saveRaporBatch(array $data)
+    {
+        return $this->db->table('nilai_rapor')->insertBatch($data);
     }
 
 }
