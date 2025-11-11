@@ -14,9 +14,6 @@ class Tarik_dapo extends BaseController
         $this->dapodikModel = new DapodikModel();
     }
     
-    /**
-     * Halaman utama
-     */
     public function index()
     {
         $data = array_merge($this->data, [
@@ -25,9 +22,6 @@ class Tarik_dapo extends BaseController
         return view('pages/settings/tarik-dapo', $data);
     }
     
-    /**
-     * Call Dapodik Web Service (adapted from your previous script)
-     */
     private function callDapodik($endpoint)
     {
         $config = $this->dapodikModel->getActiveConfig();
@@ -90,9 +84,6 @@ class Tarik_dapo extends BaseController
         ];
     }
     
-    /**
-     * Test koneksi ke web service Dapodik
-     */
     public function testConnection()
     {
         try {
@@ -134,9 +125,6 @@ class Tarik_dapo extends BaseController
         }
     }
     
-    /**
-     * Cek jumlah data dari web service Dapodik
-     */
     public function checkData($type)
     {
         try {
@@ -149,8 +137,6 @@ class Tarik_dapo extends BaseController
             }
             
             $endpoint = $this->getEndpoint($type);
-            // Asumsi $this->callDapodik() mengembalikan array: 
-            // ['success' => bool, 'data' => array/null, 'message' => string]
             $data = $this->callDapodik($endpoint);
 
             if($type == 'anggota_rombongan_belajar'){
@@ -169,15 +155,12 @@ class Tarik_dapo extends BaseController
             }
             
             if ($data['success']) {
-                // MENGIRIM SELURUH DATA KE RESPON JSON
                 return $this->response->setJSON([
                     'success' => true,
                     'count'   => $count,
-                    // 'count'   => count($data['data']),
                     'message' => "Berhasil mengecek data {$type}. Siap untuk disinkronkan."
                 ]);
             } else {
-                // Jika callDapodik gagal (misalnya karena token/server down), kirim respons error yang ada
                 return $this->response->setJSON($data);
             }
             
@@ -190,9 +173,6 @@ class Tarik_dapo extends BaseController
         }
     }
     
-    /**
-     * Simpan data dari web service ke database MySQL
-     */
     public function saveData($type)
     {
         try {
@@ -227,7 +207,6 @@ class Tarik_dapo extends BaseController
                     'updated' => $result['updated'],
                     'total' => $result['total'],
                     'message' => "Berhasil menyimpan {$result['total']} data {$type} ({$result['saved']} baru, {$result['updated']} diperbarui)"
-                    // 'message' => $result['debug']
                 ]);
             } else {
                 return $this->response->setJSON([
@@ -245,9 +224,6 @@ class Tarik_dapo extends BaseController
         }
     }
     
-    /**
-     * Hapus semua data berdasarkan jenis
-     */
     public function deleteData($type)
     {
         try {
@@ -275,9 +251,6 @@ class Tarik_dapo extends BaseController
         }
     }
     
-    /**
-     * Simpan atau update konfigurasi Dapodik
-     */
     public function saveConfig()
     {
         try {
@@ -312,9 +285,6 @@ class Tarik_dapo extends BaseController
         }
     }
     
-    /**
-     * Get konfigurasi aktif
-     */
     public function getConfig()
     {
         try {
@@ -333,9 +303,6 @@ class Tarik_dapo extends BaseController
         }
     }
     
-    /**
-     * Get statistik semua data
-     */
     public function getStatistics()
     {
         try {
@@ -354,9 +321,6 @@ class Tarik_dapo extends BaseController
         }
     }
     
-    /**
-     * Get endpoint berdasarkan jenis data
-     */
     private function getEndpoint($type)
     {
         $endpoints = [

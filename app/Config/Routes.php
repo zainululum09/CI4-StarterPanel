@@ -76,3 +76,7 @@ $routes->post('dapodik/update_data', 'Dapodik::update_data');
 
 //get File
 $routes->get('writable/uploads/foto_siswa/(:segment)', 'Dapodik::showImage/$1');
+
+//hapus data
+$routes->post('dapodik/deleteSiswa/(:segment)', 'Dapodik::deleteSiswa/$1');
+$routes->get('nilai_siswa','Nilai_siswa::index');

@@ -105,6 +105,18 @@ class Dapodik extends BaseController
                     $view_name = 'components/_form_orangtua';
                     break;
                 
+                case 'hobi':
+                    $data_hobi = $this->dapodikModel->getSiswa($data['siswa_id']); 
+                    
+                    $data_return = [
+                       'data_hobi' => $data_hobi['siswa'],
+                       'peserta_didik_id' => $data_hobi['peserta_didik_id'],
+                       'form_title' => 'Data Hobi & Cita-cita Siswa'
+                    ];
+
+                    $view_name = 'components/_form_hobi';
+                    break;
+                
                 case 'biodata':
                     $data_siswa = $this->dapodikModel->getSiswa($data['siswa_id']); 
                     
@@ -178,6 +190,13 @@ class Dapodik extends BaseController
                     $success_msg = 'Data Orang Tua berhasil diperbarui.';
                     $id = $post['ortu_id'];
                     break;
+                    
+                case 'hobi':
+                    $model = $this->dapodikModel;                     
+                    $validation_rules = $this->getValidationRules('hobi');
+                    $success_msg = 'Data Hobi berhasil diperbarui.';
+                    $id = $post['hobi_id'];
+                    break;
                 
                 case 'biodata':
                     $model = $this->dapodikModel;                     
@@ -197,19 +216,30 @@ class Dapodik extends BaseController
                         ],
                     ];
                     $validated = $this->validate($validationRule);  
-                    if ($validated) {
-                        $path = 'writable/uploads/foto_siswa';   
-                        $image = $this->request->getFile('foto');  
-                        $filename = $image->getRandomName();
-                        $siswa = $this->dapodikModel->getSiswa($post['nisn']);
-                        $oldFile = $siswa['siswa']->foto;
-                        if($oldFile){
-                            $oldPath = $path. DIRECTORY_SEPARATOR.$oldFile;
-                            @unlink($oldPath);
+                    if ($validated) {    
+                        $path = 'writable/uploads/foto_siswa';
+                        $targetDir = WRITEPATH . 'uploads/foto_siswa'; 
+                        $image = $this->request->getFile('foto');
+                        if ($image && $image->isValid() && !$image->hasMoved()) {
+                            $siswa = $this->dapodikModel->getSiswa($post['nisn']);
+                            $oldFile = $siswa['siswa']->foto ?? null;
+                            $filename = $image->getRandomName(); 
+                            $destinationPath = $targetDir . DIRECTORY_SEPARATOR . $filename;
+                            if (!is_dir($targetDir)) { mkdir($targetDir, 0777, true); }
+                            if (compressImage($image->getTempName(), $destinationPath, 25)) {
+                                if($oldFile) {
+                                    $oldFilePath = $targetDir . DIRECTORY_SEPARATOR . $oldFile;
+                                    if (file_exists($oldFilePath)) {
+                                        @unlink($oldFilePath); 
+                                    }
+                                }
+                                $post['foto'] = $filename;
+                            } else {
+                            }
+                        } else {
+                            unset($post['foto']); 
                         }
-                        $image->move(ROOTPATH . $path, $filename);  
-                        $post['foto'] = $image->getName();
-                    };  
+                    }
                     break;
 
                 default:
@@ -284,6 +314,11 @@ class Dapodik extends BaseController
                     'nama' => 'required|string',
                     'nisn' => 'required|string',
                     'nik' => 'required|string',
+                ];
+            case 'hobi':
+                return [
+                    'hobi' => 'required|string',
+                    'cita_cita' => 'required|string',
                 ];
         }
     }
@@ -364,6 +399,32 @@ class Dapodik extends BaseController
         }
 
         echo $data;
+    }
+
+    public function deleteSiswa($pd_id)
+    {
+        try {
+        $result = $this->dapodikModel->deleteSingleSiswa($pd_id);
+        
+        if ($result) {
+            return $this->response->setJSON([
+                'success' => true,
+                'message' => 'Data siswa berhasil dihapus'
+            ]);
+        } else {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'Gagal menghapus data atau siswa tidak ditemukan'
+            ]);
+        }
+
+    } catch (\Exception $e) {
+        log_message('error', 'Error deleting single student data: ' . $e->getMessage());
+        return $this->response->setJSON([
+            'success' => false,
+            'message' => 'Terjadi kesalahan sistem saat menghapus data.'
+        ]);
+    }
     }
 }
 		

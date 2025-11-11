@@ -1,6 +1,7 @@
 <?= $this->extend('layouts/main'); ?>
 <?= $this->section('content'); ?>
-<h1 class="h3 mb-3"><strong><?= $title.": ". strtoupper($siswa->nama);?></strong></h1>
+<h1 class="h3 mb-3 d-flex justify-content-between"><strong><?= $title.": ". strtoupper($siswa->nama);?></strong></h1>
+
 <div class="container mt-5">
     <div class="card shadow">
         <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
@@ -21,13 +22,13 @@
                     <?php if ($foto_tersedia): ?>
                         <img src="<?= $foto ?>" 
                             alt="Foto Siswa: <?= $siswa->nama ?>" 
-                            class="img-thumbnail rounded-circle" 
+                            class="img-thumbnail" 
                             style="width: 150px; height: 150px; object-fit: cover;">
                     <?php else: 
                         // FOTO TIDAK ADA: Tampilkan Ikon Placeholder
                         $icon_class = ($jenis_kelamin === 'L') ? 'fa-male' : 'fa-female';
                     ?>
-                        <div class="rounded-circle bg-light d-flex justify-content-center align-items-center mx-auto" 
+                        <div class="bg-light d-flex justify-content-center align-items-center mx-auto" 
                             style="width: 150px; height: 150px; border: 1px solid #ccc;">
                             <i class="fas <?= $icon_class ?>" style="font-size: 80px; color: #6c757d;"></i>
                         </div>
@@ -35,6 +36,7 @@
                 </div>
                 <div class="col-md-9">
                     <table class="table table-sm table-borderless">
+                        <tr><th><i class="fas fa-id-badge me-2 text-primary"></i> NIK</th><td>:</td><td><?= $siswa->nik ?></td></tr>
                         <tr><th><i class="fas fa-id-badge me-2 text-primary"></i> NISN/NIPD</th><td>:</td><td><?= $siswa->nisn . ' / ' . $siswa->nipd ?></td></tr>
                         <tr><th><i class="fas fa-map-marker-alt me-2 text-info"></i> Tempat, Tgl. Lahir</th><td>:</td><td><?= $siswa->tempat_lahir . ', ' . date('d M Y', strtotime($siswa->tanggal_lahir)) ?></td></tr>
                         <tr><th><i class="fas fa-venus-mars me-2 text-danger"></i> Jenis Kelamin</th><td>:</td><td><?= $siswa->jenis_kelamin === 'L' ? 'Laki-laki' : 'Perempuan' ?></td></tr>
@@ -109,6 +111,9 @@
                         <tr><th style="width: 25%;"><i class="fas fa-puzzle-piece me-2"></i> Hobi</th><td><?= $siswa->hobi ?? '-' ?></td></tr>
                         <tr><th><i class="fas fa-plane-departure me-2"></i> Cita-cita</th><td><?= $siswa->cita_cita ?? '-' ?></td></tr>
                     </table>
+                    <button type="button" class="btn btn-sm btn-outline-primary btn-dynamic-edit" data-action="hobi"  data-bs-toggle="modal" data-bs-target="#globalEditModal" data-title="Edit Data Hobi">
+                        <i class="fas fa-edit"></i> Edit
+                    </button>
                 </div>
 
                 <div class="tab-pane fade" id="kesehatan-data" role="tabpanel">
@@ -196,10 +201,10 @@ $(document).ready(function() {
         const title = $(this).data('title'); 
         const apiUrl = '/dapodik/get_form/' + actionType + '/' + CURRENT_SISWA_ID;
         const urlWil = '/dapodik/getProvinces'; 
-        if(actionType!=="kesehatan"){
-            $('.modal-dialog').addClass('modal-lg')
-        } else {
+        if(actionType==="kesehatan"||actionType==="hobi"){
             $('.modal-dialog').removeClass('modal-lg')
+        } else {
+            $('.modal-dialog').addClass('modal-lg')
         }
 
         modalTitle.html('<i class="fas fa-edit"></i> ' + title);

@@ -79,3 +79,44 @@ if (!function_exists('job')) {
     }
 }
 
+if (!function_exists('compressImage')) {
+    function compressImage($sourcePath, $destinationPath, $quality = 75) {
+        
+        $imageInfo = getimagesize($sourcePath);
+        $mime = $imageInfo['mime'];
+        
+        $image = null;
+        
+        // Buat sumber gambar
+        if ($mime == 'image/jpeg' || $mime == 'image/jpg') {
+            $image = imagecreatefromjpeg($sourcePath);
+        } elseif ($mime == 'image/png') {
+            $image = imagecreatefrompng($sourcePath);
+            // Nonaktifkan blending dan simpan transparansi (penting untuk PNG)
+            imagealphablending($image, false);
+            imagesavealpha($image, true);
+        } elseif ($mime == 'image/gif') {
+            $image = imagecreatefromgif($sourcePath);
+        } else {
+            return false;
+        }
+
+        if ($image !== null) {
+            // Jika formatnya PNG dan Anda ingin mempertahankan transparansi/kualitas PNG
+            if ($mime == 'image/png') {
+                // Kualitas PNG berkisar 0 (tanpa kompresi) hingga 9 (kompresi maksimum)
+                // Kita balik kualitasnya karena 75% kualitas JPEG ~ 5-6 kualitas kompresi PNG
+                $compressionLevel = 9 - round($quality / 100 * 9); 
+                $success = imagepng($image, $destinationPath, $compressionLevel);
+            } else {
+                // Simpan sebagai JPEG dengan kualitas yang ditentukan
+                $success = imagejpeg($image, $destinationPath, $quality);
+            }
+            
+            imagedestroy($image);
+            return $success;
+        }
+        
+        return false;
+    }
+}

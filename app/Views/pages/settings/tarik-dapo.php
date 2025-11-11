@@ -246,7 +246,7 @@
                     </table>
                 </div>
                 
-                <div class="alert alert-info">
+                <div class="alert alert-info p-2">
                     <h6 class="mb-2"><i class="fas fa-info-circle me-2"></i>Informasi</h6>
                     <ul class="mb-0 small">
                         <li>Klik <strong>Test Koneksi</strong> untuk memastikan koneksi ke web service Dapodik</li>

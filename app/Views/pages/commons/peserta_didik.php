@@ -32,5 +32,55 @@
         </div>
     </div>
 </div>
+<script>
+    $(document).ready(function() {
+    $('.delete-data-btn').on('click', function() {
+        const dataId = $(this).data('id');
+        const dataNama = $(this).data('nama');
+        
+        Swal.fire({
+            title: 'Apakah Anda Yakin?',
+            html: `Anda akan menghapus data dari siswa <strong>${dataNama.toUpperCase()}</strong>`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Ya, Hapus!',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Swal.fire({
+                    title: 'Memproses...',
+                    text: 'Sedang menghapus data...',
+                    allowOutsideClick: false,
+                    showConfirmButton: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+
+                $.ajax({
+                    url: '<?= base_url("dapodik/deleteSiswa/") ?>'+dataId, 
+                    method: 'POST', 
+                    dataType: 'json',
+                    success: function(response) {
+                        if (response.success) {
+                            Swal.fire('Berhasil Dihapus!', response.message, 'success')
+                                .then(() => {
+                                    window.location.reload();
+                                });
+                        } else {                        
+                            Swal.fire('Gagal!', response.message, 'error');
+                        }
+                    },
+                    error: function() {
+                        Swal.fire('Error', 'Terjadi kesalahan koneksi atau server saat menghapus data ' +dataId+'.', 'error');
+                    }
+                });
+            }
+        });
+    });
+});
+</script>
 <?= $this->endSection(); ?>
 		
