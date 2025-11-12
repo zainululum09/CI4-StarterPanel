@@ -74,17 +74,37 @@
         </div>
         
         <div class="col-sm-3">
+            <label for="tinggal_bersama" class="form-label">Tinggal Bersama</label>
+        </div>
+        <div class="col-sm-8"> 
+            <select name="tinggal_bersama" class="form-select" id="tinggal_bersama">
+                <option value="<?= $data_siswa->tinggal_bersama ?? '' ?>" selected><?= $data_siswa->tinggal_bersama ?? '= Tinggal Bersama ='?></option>
+                <?= tinggal_bersama(); ?>
+            </select>
+        </div>
+        
+        <div class="col-sm-3">
+            <label for="jenis_transportasi" class="form-label">Moda Transportasi</label>
+        </div>
+        <div class="col-sm-8"> 
+            <select name="jenis_transportasi" class="form-select" id="jenis_transportasi">
+                <option value="<?= $data_siswa->jenis_transportasi ?? '' ?>" selected><?= $data_siswa->jenis_transportasi ?? '= Jenis Transportasi ='?></option>
+                <?= jenis_transportasi(); ?>
+            </select>
+        </div>
+
+        <div class="col-sm-3">
             <label for="anak_keberapa" class="form-label">Anak ke-</label>
         </div>
         <div class="col-sm-8"> 
             <input id="anak_keberapa" type="number" class="form-control" name="anak_keberapa" min="1" value="<?= $data_siswa->anak_keberapa ?? ''; ?>">
         </div>
-        
+
         <div class="col-sm-3">
-            <label for="sekolah_asal" class="form-label">Sekolah Asal</label>
+            <label for="jumlah_saudara" class="form-label">Jumlah Saudara</label>
         </div>
         <div class="col-sm-8"> 
-            <input id="sekolah_asal" type="text" class="form-control" name="sekolah_asal" value="<?= $data_siswa->sekolah_asal ?? ''; ?>">
+            <input id="jumlah_saudara" type="number" class="form-control" name="jumlah_saudara" min="1" value="<?= $data_siswa->jumlah_saudara ?? ''; ?>">
         </div>
         
     </div>

@@ -63,7 +63,7 @@ $routes->get('tarik-dapo/config', 'Tarik_dapo::getConfig');
 
 // Statistik
 $routes->get('tarik-dapo/statistics', 'Tarik_dapo::getStatistics');
-$routes->get('dapodik','Dapodik::index');
+$routes->get('dapodik/siswa','Dapodik::siswa');
 
 // Detail Siswa
 $routes->get('dapodik/detail_siswa/(:segment)', 'Dapodik::detailSiswa/$1');
@@ -73,6 +73,7 @@ $routes->get('dapodik/getRegencies/(:segment)', 'Dapodik::getRegencies/$1');
 $routes->get('dapodik/getDistricts/(:segment)', 'Dapodik::getDistricts/$1');
 $routes->get('dapodik/getVillages/(:segment)', 'Dapodik::getVillages/$1');
 $routes->post('dapodik/update_data', 'Dapodik::update_data');
+$routes->get('dapodik/ptk','Dapodik::ptk');
 
 //get File
 $routes->get('writable/uploads/foto_siswa/(:segment)', 'Dapodik::showImage/$1');
@@ -84,3 +85,4 @@ $routes->post('dapodik/deleteSiswa/(:segment)', 'Dapodik::deleteSiswa/$1');
 $routes->get('nilai_siswa','Nilai_siswa::index');
 $routes->get('nilai_siswa/daftar_nilai/(:segment)','Nilai_siswa::daftar_nilai/$1');
 $routes->post('nilai_siswa/upload', 'Nilai_siswa::upload');
+$routes->get('spmb','Spmb::index');

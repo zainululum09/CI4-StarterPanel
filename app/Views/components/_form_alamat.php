@@ -12,6 +12,7 @@
             <input id="alamat" type="text" class="form-control" name="alamat" value="<?= $data_alamat->alamat; ?>" required>
         </div>
 
+        
         <div class="col-sm-3">
             <label for="provinsi_code" class="form-label">Provinsi</label>
         </div>
@@ -31,7 +32,7 @@
             </select>
             <input type="hidden" name="kabupaten" id="kabupaten" value="<?= $data_alamat->kabupaten ??'' ?>">
         </div>
-            
+        
         <div class="col-sm-3">
             <label for="kecamatan_code" class="form-label">Kecamatan</label>
         </div>
@@ -41,7 +42,7 @@
             </select>
             <input type="hidden" name="kecamatan" id="kecamatan" value="<?= $data_alamat->kecamatan ??'' ?>">
         </div>
-                
+        
         <div class="col-sm-3">
             <label for="desa_code" class="form-label">Desa/Kelurahan</label>
         </div>
@@ -51,6 +52,19 @@
             </select>
             <input type="hidden" name="desa_kelurahan" id="desa_kelurahan" value="<?= $data_alamat->desa_kelurahan ??'' ?>">
         </div>                
+
+        <div class="col-sm-3">
+            <label for="rt" class="form-label">RT / RW</label>
+        </div>
+        <div class="col-sm-8 d-flex justify-content-start">
+            <div class="col-sm-3">
+                <input id="rt" type="number" min="001" class="form-control" name="rt" value="<?= $data_alamat->rt; ?>" required>
+            </div>
+            <div class="col-sm-1 text-center"><h2 class="text-secondary"> /</h2></div> 
+            <div class="col-sm-3">
+                <input id="rw" type="number" min="001" class="form-control" name="rw" value="<?= $data_alamat->rw; ?>" required>
+            </div>
+        </div>
         
         <div class="col-sm-3">
             <label for="kode_pos" class="form-label">Kode Pos</label>
@@ -160,7 +174,7 @@
             success: function(response){
                 const datadesa = response.data;
                 $('#desa_code').empty();
-                $('#desa_code').append('<option>= Pilih Desa =</option>');
+                $('#desa_code').append('<option>= Pilih Desa/Kelurahan =</option>');
                 
                 $.each(datadesa, function(index, desa){
                         const optionHtml = `<option value="${desa.code}">${desa.name}</option>`;

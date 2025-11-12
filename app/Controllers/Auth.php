@@ -79,7 +79,7 @@ class Auth extends BaseController
                 'inputFullname' => $inputFullname,
                 'inputUsername' => $inputEmail,
                 'inputPassword' => $inputPassword,
-                'inputRole'     => 1
+                'inputRole'     => 4
             ];
             $this->ApplicationModel->createUser($dataUser);
             session()->setFlashdata('notif_success', '<b>Registration Successfully!</b> Please login with your account.');

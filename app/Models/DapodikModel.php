@@ -267,17 +267,22 @@ class DapodikModel extends Model
                     'peserta_didik_id' => $pd_id,
                     'registrasi_id' => $row['registrasi_id'] ?? null,
                     'nipd' => $row['nipd'] ?? null,
-                    'tanggal_masuk_sekolah' => $row['tanggal_masuk_sekolah'] ?? null,
-                    'sekolah_asal' => $row['sekolah_asal'] ?? null,
                     'nama' => $row['nama'] ?? '',
                     'nisn' => $row['nisn'] ?? null,
                     'jenis_kelamin' => $row['jenis_kelamin'] ?? null,
                     'nik' => $row['nik'] ?? null,
                     'tempat_lahir' => $row['tempat_lahir'] ?? null,
-                    'tanggal_lahir' => $row['tanggal_lahir'] ?? null, // DATE
+                    'tanggal_lahir' => $row['tanggal_lahir'] ?? null,
                     'agama_id' => (int)($row['agama_id'] ?? 0),
                     'anak_keberapa' => $row['anak_keberapa'] ?? null,
                     'updated_at' => $now
+                ];
+
+                $sekolahAsal = [
+                    'peserta_didik_id'  => $pd_id,
+                    'sekolah_asal'  => $row['sekolah_asal'] ?? null,
+                    'tanggal_masuk_sekolah' => $row['tanggal_masuk_sekolah'] ?? null,
+                    'jenis_pendaftaran' => $row['jenis_pendaftaran_id_str'] ?? null
                 ];
                 
                 $contact = [
@@ -306,6 +311,7 @@ class DapodikModel extends Model
                 
                 if ($existing) {
                     $this->db->table($tableName)->where('peserta_didik_id', $pd_id)->update($saveData);
+                    $this->db->table('rwy_pendidikan_pd')->where('peserta_didik_id', $pd_id)->update($sekolahAsal);
                     $this->db->table('orang_tua')->where('peserta_didik_id', $pd_id)->update($dataOrtu);
                     $this->db->table('kesehatan_siswa')->where('peserta_didik_id', $pd_id)->update($kesehatan);
                     if($row['nomor_telepon_rumah'] || $row['nomor_telepon_seluler'] || $row['email']){
@@ -316,6 +322,7 @@ class DapodikModel extends Model
                 } else {
                     $saveData['created_at'] = $now;
                     $this->db->table($tableName)->insert($saveData);
+                    $this->db->table('rwy_pendidikan_pd')->insert($sekolahAsal);
                     $this->db->table('orang_tua')->insert($dataOrtu);
                     $this->db->table('kesehatan_siswa')->insert($kesehatan);
                     if($row['nomor_telepon_rumah'] || $row['nomor_telepon_seluler'] || $row['email']){
@@ -363,11 +370,15 @@ class DapodikModel extends Model
         $rombel_saved = 0;
         $rombel_updated = 0;
         $anggota_saved = 0;
-        $pembelajaran_saved = 0;
-        $pembelajaran_updated = 0;
+        $mapel_saved = 0; 
+        $mapel_updated = 0; 
+        $pembelajaranLink_saved = 0; 
+        $pembelajaranLink_updated = 0; 
+        
         $now = date('Y-m-d H:i:s');
         $rombelTable = 'rombel';
-        $pembelajaranTable = 'mapel';
+        $mapelTable = 'mapel';
+        $pembelajaranLinkTable = 'pembelajaran'; 
 
         if (empty($dataRombel)) {
             return ['success' => false, 'message' => 'Data Rombongan Belajar kosong.'];
@@ -410,28 +421,55 @@ class DapodikModel extends Model
 
                 if (!empty($row['pembelajaran']) && is_array($row['pembelajaran'])) {
                     foreach ($row['pembelajaran'] as $pb) {
-                        $pembelajaran_id = trim($pb['mata_pelajaran_id'] ?? '');
-                        if (empty($pembelajaran_id)) continue;
+                        $mata_pelajaran_id = trim($pb['mata_pelajaran_id'] ?? '');
+                        $ptk_id = trim($pb['ptk_id'] ?? '');
+                        $pembelajaran_id_dapodik = trim($pb['pembelajaran_id'] ?? ''); 
+                        
+                        if (empty($mata_pelajaran_id) || empty($pembelajaran_id_dapodik)) continue;
 
-                        $existingPemb = $this->db->table($pembelajaranTable)
-                            ->where('mata_pelajaran_id', $pembelajaran_id)
+                        $existingMapel = $this->db->table($mapelTable)
+                            ->where('mata_pelajaran_id', $mata_pelajaran_id)
                             ->get()->getRow();
 
-                        $savePemb = [
-                            'mata_pelajaran_id' => $pb['mata_pelajaran_id'] ?? null,
+                        $saveMapel = [
+                            'mata_pelajaran_id' => $mata_pelajaran_id,
                             'nama_mata_pelajaran' => $pb['nama_mata_pelajaran'] ?? null,
                             'updated_at' => $now
                         ];
 
-                        if ($existingPemb) {
-                            $this->db->table($pembelajaranTable)
-                                ->where('mata_pelajaran_id', $pembelajaran_id)
-                                ->update($savePemb);
-                            $pembelajaran_updated++;
+                        if ($existingMapel) {
+                            $this->db->table($mapelTable)
+                                ->where('mata_pelajaran_id', $mata_pelajaran_id)
+                                ->update($saveMapel);
+                            $mapel_updated++;
                         } else {
-                            $savePemb['created_at'] = $now;
-                            $this->db->table($pembelajaranTable)->insert($savePemb);
-                            $pembelajaran_saved++;
+                            $saveMapel['created_at'] = $now;
+                            $this->db->table($mapelTable)->insert($saveMapel);
+                            $mapel_saved++;
+                        }
+
+                        $existingPembelajaran = $this->db->table($pembelajaranLinkTable)
+                            ->where('pembelajaran_id', $pembelajaran_id_dapodik)
+                            ->get()->getRow();
+
+                        $savePembelajaranLink = [
+                            'pembelajaran_id' => $pembelajaran_id_dapodik,
+                            'rombongan_belajar_id' => $rombel_id,
+                            'mata_pelajaran_id' => $mata_pelajaran_id,
+                            'ptk_id' => $ptk_id, 
+                            'updated_at' => $now
+                        ];
+
+                        if ($existingPembelajaran) {
+                            $this->db->table($pembelajaranLinkTable)
+                                ->where('pembelajaran_id', $pembelajaran_id_dapodik)
+                                ->update($savePembelajaranLink);
+                            $pembelajaranLink_updated++;
+                        } else {
+                            $savePembelajaranLink['created_at'] = $now;
+                            
+                            $this->db->table($pembelajaranLinkTable)->insert($savePembelajaranLink);
+                            $pembelajaranLink_saved++;
                         }
                     }
                 }
@@ -439,15 +477,17 @@ class DapodikModel extends Model
 
             $this->db->transComplete();
             if ($this->db->transStatus() === false) {
-                throw new \Exception('Transaksi database gagal saat menyimpan Rombel dan Pembelajaran.');
+                throw new \Exception('Transaksi database gagal saat menyimpan Rombel, Mapel, dan Pembelajaran.');
             }
 
             return [
                 'success' => true,
                 'saved' => $rombel_saved,
                 'updated' => $rombel_updated,
-                'pembelajaran_saved' => $pembelajaran_saved,
-                'pembelajaran_updated' => $pembelajaran_updated,
+                'mapel_saved' => $mapel_saved, 
+                'mapel_updated' => $mapel_updated, 
+                'pembelajaran_saved' => $pembelajaranLink_saved, 
+                'pembelajaran_updated' => $pembelajaranLink_updated, 
                 'total' => $rombel_saved + $rombel_updated
             ];
         } catch (\Exception $e) {
@@ -710,23 +750,35 @@ class DapodikModel extends Model
                 }
             break;
 
-            case 'orangtua':                
+            case 'orangtua':
                 unset($post['type']);
-                $builder = $this->db->table('orang_tua');
-                $id = $post['ortu_id'];
+                $builder = $this->db->table('orang_tua'); 
+                
+                $id = $post['ortu_id'] ?? null;
+                
+                $post['tanggal_lahir_ayah'] = clean_and_format_date($post['tanggal_lahir_ayah'] ?? null);
+                $post['tanggal_lahir_ibu']  = clean_and_format_date($post['tanggal_lahir_ibu'] ?? null);
+                $post['tanggal_lahir_wali'] = clean_and_format_date($post['tanggal_lahir_wali'] ?? null);
+
                 if (empty($id)) {
+                    unset($post['ortu_id']); 
                     $result = $builder->insert($post);
                 } else {
                     $builder->where('ortu_id', $id);
                     $result = $builder->update($post);
                 }
-                
+
                 if ($result) {
-                    return ['status' => 'success', 'message' => 'Data berhasil diupdate'];
+                    if ($this->db->affectedRows() > 0 || empty($id)) { 
+                        $message = empty($id) ? 'Data berhasil ditambahkan' : 'Data berhasil diupdate';
+                        return ['status' => 'success', 'message' => $message];
+                    } else {
+                        return ['status' => 'success', 'message' => 'Tidak ada perubahan pada data'];
+                    }
                 } else {
-                    return ['status' => 'error', 'message' => 'Tidak ada perubahan'];
+                    return ['status' => 'error', 'message' => 'Gagal menyimpan data ke database.'];
                 }
-            break;
+                break;
 
             case 'hobi':                
                 unset($post['type']);
@@ -804,6 +856,15 @@ class DapodikModel extends Model
     public function saveRaporBatch(array $data)
     {
         return $this->db->table('nilai_rapor')->insertBatch($data);
+    }
+
+    public function getGtk()
+    {
+        $ptk = $this->db->table('ptk')
+                ->orderby('nama', 'ASC')
+                ->get()
+                ->getResult();
+        return $ptk;
     }
 
 }

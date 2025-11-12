@@ -1,16 +1,15 @@
 <?= $this->extend('layouts/main'); ?>
 <?= $this->section('content'); ?>
-<h1 class="h3 mb-3 d-flex justify-content-between"><strong><?= $title.": ". strtoupper($siswa->nama);?></strong></h1>
 
-<div class="container mt-5">
+<div class="container">
     <div class="card shadow">
         <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-            <h4 class="mb-0"><i class="fas fa-user-circle me-2"></i> Biodata</h4>
+            <h1 class="h3 text-white"><strong><?= $title.": ". strtoupper($siswa->nama);?></strong></h1>
             <button type="button" class="btn btn-sm btn-outline-light btn-dynamic-edit" data-action="biodata"  data-bs-toggle="modal" data-bs-target="#globalEditModal" data-title="Edit Biodata Siswa">
                 <i class="fas fa-edit"></i> Edit
             </button>
         </div>
-        <div class="card-body">
+        <div class="card-body fs-5">
 
             <div class="row mb-4">
                 <div class="col-md-3 text-center">
@@ -40,7 +39,10 @@
                         <tr><th><i class="fas fa-id-badge me-2 text-primary"></i> NISN/NIPD</th><td>:</td><td><?= $siswa->nisn . ' / ' . $siswa->nipd ?></td></tr>
                         <tr><th><i class="fas fa-map-marker-alt me-2 text-info"></i> Tempat, Tgl. Lahir</th><td>:</td><td><?= $siswa->tempat_lahir . ', ' . date('d M Y', strtotime($siswa->tanggal_lahir)) ?></td></tr>
                         <tr><th><i class="fas fa-venus-mars me-2 text-danger"></i> Jenis Kelamin</th><td>:</td><td><?= $siswa->jenis_kelamin === 'L' ? 'Laki-laki' : 'Perempuan' ?></td></tr>
-                        <tr><th><i class="fas fa-calendar-day me-2 text-success"></i> Tanggal Masuk</th><td>:</td><td><?= date('d M Y', strtotime($siswa->tanggal_masuk_sekolah)) ?></td></tr>
+                        <tr><th><i class="fas fa-user me-2 text-warning"></i> Anak-ke</th><td>:</td><td><?= $siswa->anak_keberapa ?></td></tr>
+                        <tr><th><i class="fas fa-users me-2 text-primary"></i> Jumlah Saudara</th><td>:</td><td><?= $siswa->jumlah_saudara ?></td></tr>
+                        <tr><th><i class="fas fa-home me-2 text-danger"></i> Tinggal Bersama</th><td>:</td><td><?= $siswa->tinggal_bersama ?></td></tr>
+                        <tr><th><i class="fa-solid fa-person-walking me-2 text-success"></i> Jenis Transportasi</th><td>:</td><td><?= $siswa->jenis_transportasi ?></td></tr>
                     </table>
                 </div>
             </div>
@@ -51,6 +53,11 @@
                 <li class="nav-item" role="presentation">
                     <button class="nav-link active" id="alamat-tab" data-bs-toggle="tab" data-bs-target="#alamat-data" type="button" role="tab">
                         <i class="fas fa-home me-1"></i> Alamat & Kontak
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="riwayat-tab" data-bs-toggle="tab" data-bs-target="#riwayat-data" type="button" role="tab">
+                        <i class="fas fa-home me-1"></i> Pendidikan Sebelumnya
                     </button>
                 </li>
                 <li class="nav-item" role="presentation">
@@ -79,8 +86,8 @@
                 
                 <div class="tab-pane fade show active" id="alamat-data" role="tabpanel">
                     <table class="table table-sm">
-                        <tr><th style="width: 25%;"><i class="fas fa-map-marked-alt me-2"></i> Alamat Lengkap</th><td><?= $siswa->alamat ?? '-' ?>, <?= $siswa->desa_kelurahan ?? '-' ?></td></tr>
-                        <tr><th><i class="fas fa-city me-2"></i> Kecamatan/Kab/Prov</th><td><?= $siswa->kecamatan ?? '-' ?> / <?= $siswa->kabupaten ?? '-' ?> / <?= $siswa->provinsi ?? '-' ?></td></tr>
+                        <tr><th style="width: 25%;"><i class="fas fa-map-marked-alt me-2"></i> Alamat Lengkap</th><td><?= $siswa->alamat ?? '-' ?> RT/RW<?= $siswa->rt ?? '-' ?>/<?= $siswa->rw ?? '-' ?></td></tr>
+                        <tr><th><i class="fas fa-city me-2"></i> Desa/Kecamatan/Kab/Prov</th><td><?= $siswa->desa_kelurahan ?? '-' ?> / <?= $siswa->kecamatan ?? '-' ?> / <?= $siswa->kabupaten ?? '-' ?> / <?= $siswa->provinsi ?? '-' ?></td></tr>
                         <tr><th><i class="fas fa-mobile-alt me-2"></i> Telepon Seluler</th><td><?= $siswa->telepon_seluler ?? $siswa->telepon_rumah ?? '-' ?></td></tr>
                         <tr><th><i class="fas fa-envelope me-2"></i> Email</th><td><?= $siswa->email ?? '-' ?></td></tr>
                     </table>
@@ -89,17 +96,46 @@
                     </button>
                 </div>
 
+                <div class="tab-pane fade" id="riwayat-data" role="tabpanel">    
+                </div>
+
                 <div class="tab-pane fade" id="ortu-data" role="tabpanel">
                     <table class="table table-sm">
-                        <tr><th style="width: 25%;"><i class="fas fa-male me-2"></i> Nama Ayah</th><td><?= $siswa->nama_ayah ?? '-' ?></td></tr>
+                        <tr><th colspan="2" class="bg-info px-4 pt-2"><h3 class="h3 text-white pt-1 pb-0"><i class="fas fa-grip-vertical"></i> Data Ayah</h3></th></tr>
+                        <tr><th style="width: 25%;"><i class="fas fa-credit-card me-2"></i> Nama Ayah</th><td><?= $siswa->nama_ayah ?? '-' ?></td></tr>
+                        <tr><th style="width: 25%;"><i class="fas fa-calendar me-2"></i> Tempat, Tanggal Lahir Ayah</th><td><?= $siswa->tempat_lahir_ayah ?? '-' ?>, <?= tanggal_indo($siswa->tanggal_lahir_ayah ?? '-') ?></td></tr>
+                        <tr><th style="width: 25%;"><i class="fas fa-book-open me-2"></i> Pendidikan Ayah</th><td><?= $siswa->pendidikan_ayah ?? '-' ?></td></tr>
                         <tr><th><i class="fas fa-briefcase me-2"></i> Pekerjaan Ayah</th><td><?= job($siswa->pekerjaan_ayah_id) ?? '-' ?></td></tr>
+                        <tr><th><i class="fas fa-dollar-sign me-2"></i> Penghasilan Ayah</th><td><?= $siswa->penghasilan_ayah ?? '-' ?></td></tr>
                         <tr><th><i class="fas fa-mobile-alt me-2"></i> No. Telepon Ayah</th><td><?= $siswa->telepon_ayah ?? '-' ?></td></tr>
-                        <tr><th><i class="fas fa-female me-2"></i> Nama Ibu</th><td><?= $siswa->nama_ibu ?? '-' ?></td></tr>
+
+                        <tr><th colspan="2" class="bg-info px-4 pt-2"><h3 class="h3 text-white pt-1 pb-0"><i class="fas fa-grip-vertical"></i> Data Ibu</h3></th></tr>
+                        <tr><th><i class="fas fa-credit-card me-2"></i> Nama Ibu</th><td><?= $siswa->nama_ibu ?? '-' ?></td></tr>
+                        <tr><th style="width: 25%;"><i class="fas fa-calendar me-2"></i> Tempat, Tanggal Lahir Ibu</th><td><?= $siswa->tempat_lahir_ibu ?? '-' ?>, <?= tanggal_indo($siswa->tanggal_lahir_ibu ?? '-') ?></td></tr>
+                        <tr><th style="width: 25%;"><i class="fas fa-book-open me-2"></i> Pendidikan Ayah</th><td><?= $siswa->pendidikan_ibu ?? '-' ?></td></tr>
                         <tr><th><i class="fas fa-briefcase me-2"></i> Pekerjaan Ibu</th><td><?= job($siswa->pekerjaan_ibu_id) ?? '-' ?></td></tr>
+                        <tr><th><i class="fas fa-dollar-sign me-2"></i> Penghasilan Ibu</th><td><?= $siswa->penghasilan_ibu ?? '-' ?></td></tr>
                         <tr><th><i class="fas fa-mobile-alt me-2"></i> No. Telepon Ibu</th><td><?= $siswa->telepon_ibu ?? '-' ?></td></tr>
+                        
+                        <tr><th colspan="2" class="bg-info px-4 pt-2"><h3 class="h3 text-white pt-1 pb-0"><i class="fas fa-grip-vertical"></i> Data Wali</h3></th></tr>
                         <tr><th><i class="fas fa-user-tie me-2"></i> Nama Wali</th><td><?= $siswa->nama_wali ?? '-' ?></td></tr>
+                        <?php
+                            if($siswa->nama_wali=''){
+                        ?>
+                        <tr><th style="width: 25%;"><i class="fas fa-calendar me-2"></i> Tempat, Tanggal Lahir Wali</th><td><?= $siswa->tempat_lahir_wali ?? '-' ?>, <?= tanggal_indo($siswa->tanggal_lahir_wali ?? '-') ?></td></tr>
+                        <tr><th style="width: 25%;"><i class="fas fa-book-open me-2"></i> Pendidikan Ayah</th><td><?= $siswa->pendidikan_wali ?? '-' ?></td></tr>
                         <tr><th><i class="fas fa-briefcase me-2"></i> Pekerjaan Wali</th><td><?= job($siswa->pekerjaan_wali_id) ?? '-' ?></td></tr>
+                        <tr><th><i class="fas fa-dollar-sign me-2"></i> Penghasilan Wali</th><td><?= $siswa->penghasilan_wali ?? '-' ?></td></tr>
                         <tr><th><i class="fas fa-mobile-alt me-2"></i> No. Telepon Wali</th><td><?= $siswa->telepon_wali ?? '-' ?></td></tr>
+                        <?php
+                            } else {
+                        ?>
+                        <tr>
+                            <th colspan="2" class="py-2"></th>
+                        </tr>
+                        <?php
+                            }
+                        ?>
                     </table>
                     <button type="button" class="btn btn-sm btn-outline-primary btn-dynamic-edit" data-action="orangtua"  data-bs-toggle="modal" data-bs-target="#globalEditModal" data-title="Edit Data Orangtua">
                         <i class="fas fa-edit"></i> Edit
@@ -165,10 +201,10 @@
     <div class="modal-dialog">
         <div class="modal-content">
             
-            <div class="modal-header bg-primary text-white">
-                <h5 class="modal-title" id="globalEditModalLabel">
+            <div class="modal-header bg-primary">
+                <h4 class="modal-title text-white" id="globalEditModalLabel">
                     <i class="fas fa-edit"></i> Edit Data Siswa
-                </h5>
+                </h4>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             

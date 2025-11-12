@@ -170,7 +170,7 @@
 										<select name="inputMenu" id="inputMenu" class="form-control <?= ($validation->hasError('inputMenu')) ? 'is-invalid' : ''; ?>" autofocus value="<?= old('inputMenu'); ?>">
 											<option value=""> -- Choose Menu Parent --</option>
 											<?php foreach ($Menus as $menu) : ?>
-												<option value="<?= $menu['id']; ?>"><?= $menu['title']; ?></option>
+												<option value="<?= $menu['menu_id']; ?>"><?= $menu['title']; ?></option>
 											<?php endforeach; ?>
 										</select>
 										<div class="invalid-feedback">

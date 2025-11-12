@@ -14,7 +14,7 @@ class Dapodik extends BaseController
         $this->dapodikModel = new DapodikModel();
     }
 
-    public function index()
+    public function siswa()
     {
         $page = $this->request->getGet('page') ?? 1;
         $tr = $this->dapodikModel->getAllPd($page);
@@ -208,7 +208,6 @@ class Dapodik extends BaseController
                         'foto' => [
                             'label' => 'Image File',
                             'rules' => [
-                                'uploaded[foto]',
                                 'is_image[foto]',
                                 'mime_in[foto,image/jpg,image/jpeg,image/gif,image/png,image/webp]',
                                 'max_size[foto,2000]',
@@ -225,7 +224,9 @@ class Dapodik extends BaseController
                             $oldFile = $siswa['siswa']->foto ?? null;
                             $filename = $image->getRandomName(); 
                             $destinationPath = $targetDir . DIRECTORY_SEPARATOR . $filename;
-                            if (!is_dir($targetDir)) { mkdir($targetDir, 0777, true); }
+                            if (!is_dir($targetDir)) {
+                                mkdir($targetDir, 0777, true);
+                            }
                             if (compressImage($image->getTempName(), $destinationPath, 25)) {
                                 if($oldFile) {
                                     $oldFilePath = $targetDir . DIRECTORY_SEPARATOR . $oldFile;
@@ -235,6 +236,7 @@ class Dapodik extends BaseController
                                 }
                                 $post['foto'] = $filename;
                             } else {
+                                $post['foto'] = '';
                             }
                         } else {
                             unset($post['foto']); 
@@ -404,27 +406,37 @@ class Dapodik extends BaseController
     public function deleteSiswa($pd_id)
     {
         try {
-        $result = $this->dapodikModel->deleteSingleSiswa($pd_id);
-        
-        if ($result) {
-            return $this->response->setJSON([
-                'success' => true,
-                'message' => 'Data siswa berhasil dihapus'
-            ]);
-        } else {
-            return $this->response->setJSON([
-                'success' => false,
-                'message' => 'Gagal menghapus data atau siswa tidak ditemukan'
-            ]);
-        }
+            $result = $this->dapodikModel->deleteSingleSiswa($pd_id);
+            
+            if ($result) {
+                return $this->response->setJSON([
+                    'success' => true,
+                    'message' => 'Data siswa berhasil dihapus'
+                ]);
+            } else {
+                return $this->response->setJSON([
+                    'success' => false,
+                    'message' => 'Gagal menghapus data atau siswa tidak ditemukan'
+                ]);
+            }
 
-    } catch (\Exception $e) {
-        log_message('error', 'Error deleting single student data: ' . $e->getMessage());
-        return $this->response->setJSON([
-            'success' => false,
-            'message' => 'Terjadi kesalahan sistem saat menghapus data.'
-        ]);
+        } catch (\Exception $e) {
+                log_message('error', 'Error deleting single student data: ' . $e->getMessage());
+                return $this->response->setJSON([
+                    'success' => false,
+                    'message' => 'Terjadi kesalahan sistem saat menghapus data.'
+                ]);
+        }
     }
+
+    public function ptk()
+    {
+        $data = array_merge($this->data,[
+            'title'     =>  'Data PTK',
+            'ptk_data'  => $this->dapodikModel->getGtk()
+        ]);
+
+        return view('pages/commons/ptk', $data);
     }
 }
 		
