@@ -240,6 +240,87 @@ function jenis_transportasi()
     return $list_transport;
 }
 
+function hobi()
+{
+    $hobi="
+        <option value='Belanja'>Belanja</option>
+        <option value='Berkemah'>Berkemah</option>
+        <option value='Berlari'>Berlari</option>
+        <option value='Bermain Biola'>Bermain Biola</option>
+        <option value='Bermain Bola'>Bermain Bola</option>
+        <option value='Bermain Bola Tenis'>Bermain Bola Tenis</option>
+        <option value='Bermain Boneka'>Bermain Boneka</option>
+        <option value='Bermain Bulu Tangkis'>Bermain Bulu Tangkis</option>
+        <option value='Bermain Gitar'>Bermain Gitar</option>
+        <option value='Bermain Musik'>Bermain Musik</option>
+        <option value='Bermain Piano'>Bermain Piano</option>
+        <option value='Berselancar'>Berselancar</option>
+        <option value='Fitness'>Fitness</option>
+        <option value='Fotografi'>Fotografi</option>
+        <option value='Jogging'>Jogging</option>
+        <option value='Kesenian'>Kesenian</option>
+        <option value='Lainnya'>Lainnya</option>
+        <option value='Main Puzzle'>Main Puzzle</option>
+        <option value='Makan'>Makan</option>
+        <option value='Memancing'>Memancing</option>
+        <option value='Membaca'>Membaca</option>
+        <option value='Mendaki'>Mendaki</option>
+        <option value='Menggambar'>Menggambar</option>
+        <option value='Menjahit'>Menjahit</option>
+        <option value='Menulis'>Menulis</option>
+        <option value='Mewarnai Olahraga'>Mewarnai Olahraga</option>
+        <option value='Traveling'>Traveling</option>
+    ";
+    return $hobi;
+}
+
+function cita_cita()
+{
+    $cita_cita = "
+        <option value='Arsitek'>Arsitek</option>
+        <option value='Astronot'>Astronot</option>
+        <option value='Atlet'>Atlet</option>
+        <option value='Atlet E-Sport Profesional'>Atlet E-Sport Profesional</option>
+        <option value='Atlet Olahraga'>Atlet Olahraga</option>
+        <option value='Bidan'>Bidan</option>
+        <option value='Konten Kreator'>Konten Kreator</option>
+        <option value='Dai / Ustadz'>Dai / Ustadz</option>
+        <option value='Designer'>Designer</option>
+        <option value='Dokter'>Dokter</option>
+        <option value='Entertainer / Pekerja Seni'>Entertainer / Pekerja Seni</option>
+        <option value='Guru / Dosen'>Guru / Dosen</option>
+        <option value='Koki'>Koki</option>
+        <option value='Lainnya'>Lainnya</option>
+        <option value='Masinis Kereta Api'>Masinis Kereta Api</option>
+        <option value='Pegawai Negeri Sipil / PNS'>Pegawai Negeri Sipil / PNS</option>
+        <option value='Pelaut'>Pelaut</option>
+        <option value='Pemadam Kebakaran'>Pemadam Kebakaran</option>
+        <option value='Pembalap'>Pembalap</option>
+        <option value='Pembawa Acara / Master Ceremony'>Pembawa Acara / Master Ceremony</option>
+        <option value='Pendeta'>Pendeta</option>
+        <option value='Pengacara'>Pengacara</option>
+        <option value='Penghafal Alquran'>Penghafal Alquran</option>
+        <option value='Pengusaha / Businessman'>Pengusaha / Businessman</option>
+        <option value='Penulis'>Penulis</option>
+        <option value='Penyiar Radio'>Penyiar Radio</option>
+        <option value='Perawat'>Perawat</option>
+        <option value='Perawat / Suster'>Perawat / Suster</option>
+        <option value='Pilot'>Pilot</option>
+        <option value='PNS'>PNS</option>
+        <option value='Polisi'>Polisi</option>
+        <option value='Politikus'>Politikus</option>
+        <option value='Presiden'>Presiden</option>
+        <option value='Seni/Lukis/Artis/Sejenis'>Seni/Lukis/Artis/Sejenis</option>
+        <option value='TNI/Polri'>TNI/Polri</option>
+        <option value='Translator'>Translator</option>
+        <option value='Vlogger'>Vlogger</option>
+        <option value='Wartawan'>Wartawan</option>
+        <option value='Wiraswasta'>Wiraswasta</option>
+        ";
+
+        return $cita_cita;
+}
+
 if (!function_exists('tanggal_indo')) {
     /**
      * Format tanggal dan waktu ke bahasa Indonesia

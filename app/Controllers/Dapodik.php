@@ -128,6 +128,18 @@ class Dapodik extends BaseController
 
                     $view_name = 'components/_form_biodata';
                     break;
+                
+                case 'riwayatpendidikan':
+                    $data_siswa = $this->dapodikModel->getSiswa($data['siswa_id']); 
+                    
+                    $data_return = [
+                       'data_siswa' => $data_siswa['siswa'],
+                       'peserta_didik_id' => $data_siswa['peserta_didik_id'],
+                       'form_title' => 'Data Sekolah Asal'
+                    ];
+
+                    $view_name = 'components/_form_rwy_sekolah';
+                    break;
                     
                 default:
                     throw new \CodeIgniter\Exceptions\PageNotFoundException('Jenis form tidak valid: ' . $type);
@@ -196,6 +208,13 @@ class Dapodik extends BaseController
                     $validation_rules = $this->getValidationRules('hobi');
                     $success_msg = 'Data Hobi berhasil diperbarui.';
                     $id = $post['hobi_id'];
+                    break;
+                
+                case 'riwayatpendidikan':
+                    $model = $this->dapodikModel;                     
+                    $validation_rules = $this->getValidationRules('riwayatpendidikan');
+                    $success_msg = 'Data Riwayat Pendidikan berhasil diperbarui.';
+                    $id = $post['peserta_didik_id'];
                     break;
                 
                 case 'biodata':
@@ -321,6 +340,12 @@ class Dapodik extends BaseController
                 return [
                     'hobi' => 'required|string',
                     'cita_cita' => 'required|string',
+                ];
+            case 'riwayatpendidikan':
+                return [
+                    'npsn' => 'string',
+                    'alamat_sekolah_asal' => 'string',
+                    'nomor_ijazah' => 'string',
                 ];
         }
     }

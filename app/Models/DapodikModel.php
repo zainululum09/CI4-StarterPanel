@@ -277,12 +277,13 @@ class DapodikModel extends Model
                     'anak_keberapa' => $row['anak_keberapa'] ?? null,
                     'updated_at' => $now
                 ];
-
+                
                 $sekolahAsal = [
                     'peserta_didik_id'  => $pd_id,
                     'sekolah_asal'  => $row['sekolah_asal'] ?? null,
                     'tanggal_masuk_sekolah' => $row['tanggal_masuk_sekolah'] ?? null,
-                    'jenis_pendaftaran' => $row['jenis_pendaftaran_id_str'] ?? null
+                    'jenis_pendaftaran' => $row['jenis_pendaftaran_id_str'] ?? null,
+                    'updated_at' => $now
                 ];
                 
                 $contact = [
@@ -321,6 +322,7 @@ class DapodikModel extends Model
 
                 } else {
                     $saveData['created_at'] = $now;
+                    $sekolahAsal['created_at'] = $now;
                     $this->db->table($tableName)->insert($saveData);
                     $this->db->table('rwy_pendidikan_pd')->insert($sekolahAsal);
                     $this->db->table('orang_tua')->insert($dataOrtu);
@@ -698,6 +700,7 @@ class DapodikModel extends Model
         $siswa = $this->db->table('pd')
                     ->join('alamat_siswa','alamat_siswa.peserta_didik_id = pd.peserta_didik_id', 'left')
                     ->join('orang_tua','orang_tua.peserta_didik_id = pd.peserta_didik_id','left')
+                    ->join('rwy_pendidikan_pd','rwy_pendidikan_pd.peserta_didik_id = pd.peserta_didik_id','left')
                     ->join('kesehatan_siswa','kesehatan_siswa.peserta_didik_id = pd.peserta_didik_id','left')
                     ->join('hobi_cita','hobi_cita.peserta_didik_id = pd.peserta_didik_id','left')
                     ->where('pd.peserta_didik_id', $pd_id->peserta_didik_id)
@@ -788,6 +791,24 @@ class DapodikModel extends Model
                     $result = $builder->insert($post);
                 } else {
                     $builder->where('hobi_id', $id);
+                    $result = $builder->update($post);
+                }
+                
+                if ($result) {
+                    return ['status' => 'success', 'message' => 'Data berhasil diupdate'];
+                } else {
+                    return ['status' => 'error', 'message' => 'Tidak ada perubahan'];
+                }
+            break;
+            
+            case 'riwayatpendidikan':                
+                unset($post['type']);
+                $builder = $this->db->table('rwy_pendidikan_pd');
+                $id = $post['peserta_didik_id'];
+                if (empty($id)) {
+                    $result = $builder->insert($post);
+                } else {
+                    $builder->where('peserta_didik_id', $id);
                     $result = $builder->update($post);
                 }
                 

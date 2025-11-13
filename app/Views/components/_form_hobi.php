@@ -4,14 +4,27 @@
     <input type="hidden" name="peserta_didik_id" value="<?= $peserta_didik_id ?? ''; ?>">
     <input type="hidden" name="hobi_id" value="<?= $data_hobi->hobi_id ?? ''; ?>">
     
-    <div class="mb-3">
-        <label for="hobi" class="form-label">Hobi</label>
-        <input type="text" class="form-control" name="hobi" value="<?= $data_hobi->hobi; ?>" required>
-    </div>
+    <div class="row g-3 align-items-center">
+        <div class="col-sm-3">
+            <label for="hobi" class="form-label">Hobi</label>
+        </div>
+        <div class="col-sm-8">
+            <select name="hobi" id="hobi" class="form-select">
+                <option value="<?= $data_hobi->hobi ?? ''; ?>"><?= $data_hobi->hobi ?? '= Pilih Hobi ='; ?></option>
+                <?= hobi(); ?>
+            </select>
+        </div>
+        
+        <div class="col-sm-3">
+            <label for="cita_cita" class="form-label">Cita-cita</label>
+        </div>
+        <div class="col-sm-8">
+            <select name="cita_cita" id="cita_cita" class="form-select">
+                <option value="<?= $data_hobi->cita_cita ?? ''; ?>"><?= $data_hobi->cita_cita ?? '= Pilih Cita-cita ='; ?></option>
+                <?= cita_cita(); ?>
+            </select>
+        </div>
 
-    <div class="mb-3">
-        <label for="cita_cita" class="form-label">Cita-cita</label>
-        <input type="text" class="form-control" name="cita_cita" value="<?= $data_hobi->cita_cita; ?>" required>
     </div>
     
     <div class="modal-footer p-0 mt-3 border-top-0">

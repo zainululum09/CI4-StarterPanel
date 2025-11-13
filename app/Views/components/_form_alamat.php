@@ -91,7 +91,7 @@
             <label for="email" class="form-label">Email Aktif</label>
         </div>
         <div class="col-sm-8">
-            <input type="text" class="form-control" name="email" id="email" value="<?= $data_alamat->email ?? '' ?>">
+            <input type="email" class="form-control" name="email" id="email" value="<?= $data_alamat->email ?? '' ?>">
         </div>                
     </div>
 

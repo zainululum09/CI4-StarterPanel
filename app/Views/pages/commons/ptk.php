@@ -3,13 +3,13 @@
 
 <div class="container">
     <div class="card shadow">
-        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-            <h1 class="h3 mb-3 d-flex justify-content-between text-white"><strong><i class="fas fa-users"></i> <?= $title;?></strong></h1>
+        <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
+            <h1 class="h3 mb-0 d-flex justify-content-between text-white"><strong><i class="fas fa-users"></i> <?= $title;?></strong></h1>
         </div>
         <div class="card-body">
             <div class="table-responsive">
                 <table class="table table-striped table-bordered table-hover text-uppercase">
-                    <thead class="table-dark text-center">
+                    <thead class="table-secondary text-center">
                         <tr>
                             <th style="width: 5%;">No</th>
                             <th style="width: 25%;">Nama Guru</th>
