@@ -126,7 +126,6 @@
 
         $('#provinsi_code').on('change', function(){
         const provCode = $(this).val();
-        console.log(provCode)
         $.ajax({
             url: '/dapodik/getRegencies/'+provCode,
             method: 'GET',

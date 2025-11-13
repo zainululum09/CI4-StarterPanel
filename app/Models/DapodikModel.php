@@ -853,7 +853,13 @@ class DapodikModel extends Model
 
     public function getRombel()
     {
-        $builder = $this->db->table('rombel')->orderby('nama','ASC')->get()->getResult();
+        $builder = $this->db->table('rombel')
+                    ->join('anggota_rombel','rombel.rombongan_belajar_id = anggota_rombel.rombongan_belajar_id','left')
+                    ->select('rombel.*, count(anggota_rombel.anggota_rombel_id) as jumlah_per')
+                    ->groupby('rombel.rombongan_belajar_id')
+                    ->orderby('rombel.nama','ASC')
+                    ->get()
+                    ->getResult();
         return $builder;
     }
 

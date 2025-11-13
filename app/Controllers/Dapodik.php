@@ -428,6 +428,17 @@ class Dapodik extends BaseController
         echo $data;
     }
 
+    public function rombel()
+    {
+        $rombel = $this->dapodikModel->getRombel();
+        $data = array_merge($this->data,[
+            'title' => 'Data Rombongan Belajar',
+            'rombel' => $rombel
+        ]);
+
+        return view('pages/commons/rombel', $data);
+    }
+
     public function deleteSiswa($pd_id)
     {
         try {
