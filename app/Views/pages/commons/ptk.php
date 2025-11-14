@@ -9,13 +9,14 @@
         <div class="card-body">
             <div class="table-responsive">
                 <table class="table table-striped table-bordered table-hover text-uppercase">
-                    <thead class="table-secondary text-center">
-                        <tr>
-                            <th style="width: 5%;">No</th>
+                    <thead class="text-center">
+                        <tr class="align-middle">
+                            <th style="width: 5%;" class="py-3">No.</th>
                             <th style="width: 25%;">Nama Guru</th>
                             <th style="width: 15%;">NIK</th>
-                            <th style="width: 20%;">Tempat, Tanggal Lahir</th>
-                            <th style="width: 15%;">#</th>
+                            <th style="width: 15%;">Tempat Lahir</th>
+                            <th style="width: 20%;">Tanggal Lahir</th>
+                            <th style="width: 15%;">Edit</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -26,7 +27,8 @@
                                     <td><?= $no++; ?></td>
                                     <td><?= esc($ptk->nama); ?></td>
                                     <td><?= esc($ptk->nik); ?></td>
-                                    <td><?= esc($ptk->tempat_lahir . ', ' . tanggal_indo($ptk->tanggal_lahir)); ?></td>
+                                    <td><?= esc($ptk->tempat_lahir); ?></td>
+                                    <td><?= esc(tanggal_indo($ptk->tanggal_lahir)); ?></td>
                                     <td class="text-center">
                                         <button class="btn btn-sm btn-warning me-1" 
                                             onclick="editPtk('<?= esc($ptk->ptk_id); ?>')">

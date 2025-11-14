@@ -1,4 +1,4 @@
-<form id="formUpdateOrangtua" action="<?= base_url('dapodik/update_data'); ?>" method="post">
+<form id="formUpdateOrangtua" action="<?= base_url('dapodik/update_data'); ?>" method="post" enctype="multipart/form-data">
 
     <input type="hidden" name="type" value="biodata" id="type">
     <input type="hidden" name="peserta_didik_id" value="<?= $peserta_didik_id ?? ''; ?>">

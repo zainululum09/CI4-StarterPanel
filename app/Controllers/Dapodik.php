@@ -27,6 +27,17 @@ class Dapodik extends BaseController
         ]);
         return view('pages/commons/peserta_didik', $data);
     }
+    
+    public function sekolah()
+    {
+        $data = array_merge($this->data,[
+            'title' => 'Data Sekolah',
+            'data'  => $this->dapodikModel->getSekolah(),
+            'path'  => base_url('writable/uploads/image/')
+        ]);
+        
+        return view('pages/commons/sekolah', $data);
+    }
 
     public function detailSiswa($nisn)
     {
@@ -34,7 +45,7 @@ class Dapodik extends BaseController
         $provinsi = '$this->getProvinces()';
         $fotoUrl = base_url('writable/uploads/foto_siswa/'. $detail['siswa']->foto);
         $data = array_merge($this->data, [
-            'title' => 'Detail Siswa',
+            'title' => 'Biodata',
             'siswa' => $detail['siswa'],
             'foto' => $fotoUrl,
             'kasus' => $detail['kasus'],
@@ -44,9 +55,9 @@ class Dapodik extends BaseController
         return view('pages/commons/detail_siswa', $data);
     }
 
-    public function showImage($filename)
+    public function showImage($folderName, $filename)
     {
-        $path = WRITEPATH . 'writable/uploads/foto_siswa/' . $filename;
+        $path = WRITEPATH . 'writable/uploads/'.$folderName.'/' . $filename;
         if (! file_exists($path)) {
             die('Foto tidak ditemukan.'); 
         }
@@ -263,6 +274,93 @@ class Dapodik extends BaseController
                     }
                     break;
 
+                case 'sekolah':
+                    $model = $this->dapodikModel;                     
+                    $validation_rules = $this->getValidationRules('sekolah');
+                    $success_msg = 'Data Sekolah berhasil diperbarui.';
+
+                    $validationRule = [
+                        'icon' => [
+                            'label' => 'Image File',
+                            'rules' => [
+                                'is_image[icon]',
+                                'mime_in[icon,image/jpg,image/jpeg,image/gif,image/png,image/webp]',
+                                'max_size[icon,1000]',
+                            ],
+                        ],
+                        'kop_sekolah' => [
+                            'label' => 'Image File',
+                            'rules' => [
+                                'is_image[kop_sekolah]',
+                                'mime_in[kop_sekolah,image/jpg,image/jpeg,image/gif,image/png,image/webp]',
+                                'max_size[kop_sekolah,2000]',
+                            ],
+                        ],
+                    ];
+                    $validated = $this->validate($validationRule);  
+                    if ($validated) {    
+                        $path = 'writable/uploads/image';
+                        $targetDir = WRITEPATH . 'uploads/image'; 
+                        $sekolah = $this->dapodikModel->getSekolah();
+
+                        $icon = $this->request->getFile('icon');
+                        if ($icon && $icon->isValid() && !$icon->hasMoved()) {
+                            $staticName = 'icon';
+                            $extension = $icon->guessExtension(); 
+                            $filename = $staticName . '.' . $extension; 
+
+                            $oldFile = $sekolah->icon ?? null;
+                            $destinationPath = $targetDir . DIRECTORY_SEPARATOR . $filename;
+
+                            if (!is_dir($targetDir)) {
+                                mkdir($targetDir, 0777, true);
+                            }
+                            
+                            if (compressImage($icon->getTempName(), $destinationPath, 25)) {
+                                if ($oldFile && $oldFile !== $filename) {
+                                    $oldFilePath = $targetDir . DIRECTORY_SEPARATOR . $oldFile;
+                                    if (file_exists($oldFilePath)) {
+                                        @unlink($oldFilePath); 
+                                    }
+                                }
+                                $post['icon'] = $filename;
+                            } else {
+                                $post['icon'] = '';
+                            }
+                        } else {
+                            unset($post['icon']); 
+                        }
+
+                        $kop = $this->request->getFile('kop_sekolah');
+                        if ($kop && $kop->isValid() && !$kop->hasMoved()) {
+                            $staticName = 'kop_sekolah';
+                            $extension = $kop->guessExtension();
+                            $filename = $staticName . '.' . $extension;
+                            
+                            $oldFile = $sekolah->kop_sekolah ?? null;
+                            $destinationPath = $targetDir . DIRECTORY_SEPARATOR . $filename;
+
+                            if (!is_dir($targetDir)) {
+                                mkdir($targetDir, 0777, true);
+                            }
+
+                            if (compressImage($kop->getTempName(), $destinationPath, 25)) {
+                                if ($oldFile && $oldFile !== $filename) {
+                                    $oldFilePath = $targetDir . DIRECTORY_SEPARATOR . $oldFile;
+                                    if (file_exists($oldFilePath)) {
+                                        @unlink($oldFilePath); 
+                                    }
+                                }
+                                $post['kop_sekolah'] = $filename;
+                            } else {
+                                $post['kop_sekolah'] = '';
+                            }
+                        } else {
+                            unset($post['kop_sekolah']); 
+                        }
+                    }
+                    break;
+
                 default:
                     return $this->response->setStatusCode(400)->setJSON([
                         'success' => false, 
@@ -335,6 +433,12 @@ class Dapodik extends BaseController
                     'nama' => 'required|string',
                     'nisn' => 'required|string',
                     'nik' => 'required|string',
+                ];
+            case 'sekolah':
+                return [
+                    'nama' => 'required|string',
+                    'npsn' => 'required|string',
+                    'nss' => 'required|string',
                 ];
             case 'hobi':
                 return [
@@ -469,7 +573,7 @@ class Dapodik extends BaseController
     {
         $data = array_merge($this->data,[
             'title'     =>  'Data PTK',
-            'ptk_data'  => $this->dapodikModel->getGtk()
+            'ptk_data'  => $this->dapodikModel->getAllGtk()
         ]);
 
         return view('pages/commons/ptk', $data);

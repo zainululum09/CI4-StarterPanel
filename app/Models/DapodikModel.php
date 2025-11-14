@@ -107,6 +107,11 @@ class DapodikModel extends Model
             'non_aktif' => $this->db->table('sekolah')->where('status_sekolah', 'N')->countAllResults()
         ];
     }
+
+    public function getSekolah()
+    {
+        return $this->db->table('data_sekolah')->get()->getRow();
+    }
     
     // ==================== PTK METHODS ====================
     public function savePtkFromDapodik($data)
@@ -157,6 +162,9 @@ class DapodikModel extends Model
                     $updated++;
                 } else {
                     $saveData['created_at'] = $now;
+                    if($saveData['jenis_ptk_id']==91){
+                        $this->db->table('data_sekolah')->set('kepala_sekolah',$saveData['nama'])->update();
+                    }
                     $this->db->table('ptk')->insert($saveData);
                     $saved++;
                 }                
@@ -836,6 +844,18 @@ class DapodikModel extends Model
                     return ['status' => 'error', 'message' => 'Tidak ada perubahan'];
                 }
             break;
+            case 'sekolah':
+                unset($post['type']);
+                $builder = $this->db->table('data_sekolah');
+                // $builder->where('peserta_didik_id', $id);
+                $result = $builder->update($post);
+                
+                if ($result) {
+                    return ['status' => 'success', 'message' => 'Data sekolah berhasil diupdate'];
+                } else {
+                    return ['status' => 'error', 'message' => 'Tidak ada perubahan'];
+                }
+            break;
         }
     }
 
@@ -885,12 +905,23 @@ class DapodikModel extends Model
         return $this->db->table('nilai_rapor')->insertBatch($data);
     }
 
-    public function getGtk()
+    public function getAllGtk()
     {
         $ptk = $this->db->table('ptk')
                 ->orderby('nama', 'ASC')
                 ->get()
                 ->getResult();
+        return $ptk;
+    }
+
+    public function getGtk($ptk)
+    {
+        $ptk = $this->db->table('ptk')
+                ->orderby('nama', 'ASC')
+                ->where('ptk_id', $ptk)
+                ->orWhere('jenis_ptk_id', $ptk)
+                ->get()
+                ->getRow();
         return $ptk;
     }
 

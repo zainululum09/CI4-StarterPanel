@@ -8,12 +8,15 @@
         </div>
         <div class="card-body">
             <div class="table-responsive">
+                <div class="action">
+                    <h4>action</h4>
+                </div>
                 <table class="table table-sm table-hover table-striped table-bordered">
-                    <thead class="table text-center align-middle bg-secondary text-light">
+                    <thead class="text-center align-middle text-uppercase">
                         <tr>
                             <th scope="col" class="py-3">#</th>
-                            <th scope="col">Rombel</th>
-                            <th scope="col">Jumlah Peserta Didik</th>
+                            <th scope="col" style="width: 10%">Rombel</th>
+                            <th scope="col" style="width: 20%">Jumlah Anggota Rombel</th>
                             <th scope="col">Wali Kelas</th>
                             <th scope="col">Lihat</th>
                         </tr>
@@ -23,12 +26,16 @@
                             $i = 1;
                             foreach ($rombel as $rb):
                         ?>
-                        <tr>
-                            <td><?= $i++ ?></td>
-                            <td><?= $rb->nama ?></td>
-                            <td><?= $rb->jumlah_per ?> Siswa</td>
+                        <tr data-id="<?= $rb->rombongan_belajar_id ?>">
+                            <td class="text-center"><?= $i++ ?></td>
+                            <td class="text-center"><?= $rb->nama ?></td>
+                            <td class="text-center"><?= $rb->jumlah_per ?> Siswa</td>
                             <td><?= $rb->ptk_id_str ?></td>
-                            <td class="text-center"><a href="#" title="Lihat Daftar Nilai" class="btn btn-sm btn-success"><i class="fas fa-eye"></i></a></td>
+                            <td class="text-center">
+                                <a href="#" title="Lihat Anggota Rombel" role="button" class="btn btn-sm py-0 btn-info">
+                                    <i class="fas fa-users"></i><small> Anggota Rombel</small>
+                                </a>
+                            </td>
                         </tr>
                         <?php
                         endforeach;

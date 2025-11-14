@@ -3,8 +3,8 @@
 
 <div class="container">
     <div class="card shadow">
-        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-            <h1 class="h3 text-white"><strong><?= $title.": ". strtoupper($siswa->nama);?></strong></h1>
+        <div class="card-header bg-primary text-white p-2 d-flex justify-content-between align-items-center">
+            <h1 class="h3 text-white mb-0"><strong><?= $title.": ". strtoupper($siswa->nama);?></strong></h1>
             <button type="button" class="btn btn-light btn-dynamic-edit" data-action="biodata"  data-bs-toggle="modal" data-bs-target="#globalEditModal" data-title="Edit Biodata Siswa">
                 <i class="fas fa-edit"></i> Edit
             </button>
@@ -22,21 +22,21 @@
                         <img src="<?= $foto ?>" 
                             alt="Foto Siswa: <?= $siswa->nama ?>" 
                             class="img-thumbnail" 
-                            style="width: 150px; height: 150px; object-fit: cover;">
+                            style="width: 150px; height: 180px; object-fit: cover;">
                     <?php else: 
                         // FOTO TIDAK ADA: Tampilkan Ikon Placeholder
                         $icon_class = ($jenis_kelamin === 'L') ? 'fa-male' : 'fa-female';
                     ?>
                         <div class="bg-light d-flex justify-content-center align-items-center mx-auto" 
-                            style="width: 150px; height: 150px; border: 1px solid #ccc;">
+                            style="width: 150px; height: 180px; border: 1px solid #ccc;">
                             <i class="fas <?= $icon_class ?>" style="font-size: 80px; color: #6c757d;"></i>
                         </div>
                     <?php endif; ?>
                 </div>
                 <div class="col-md-9">
-                    <table class="table table-sm table-borderless">
+                    <table class="table table-sm">
                         <tbody>
-                        <tr><th style="width: 25%"><i class="fas fa-id-badge me-2 text-primary"></i> NIK</th><td>:</td><td><?= $siswa->nik ?></td></tr>
+                        <tr><th style="width: 25%"><i class="fas fa-id-badge me-2 text-success"></i> NIK</th><td>:</td><td><?= $siswa->nik ?></td></tr>
                         <tr><th><i class="fas fa-id-badge me-2 text-primary"></i> NISN/NIPD</th><td>:</td><td><?= $siswa->nisn . ' / ' . $siswa->nipd ?></td></tr>
                         <tr><th><i class="fas fa-map-marker-alt me-2 text-info"></i> Tempat, Tgl. Lahir</th><td>:</td><td><?= $siswa->tempat_lahir . ', ' . tanggal_indo($siswa->tanggal_lahir) ?></td></tr>
                         <tr><th><i class="fas fa-venus-mars me-2 text-danger"></i> Jenis Kelamin</th><td>:</td><td><?= $siswa->jenis_kelamin === 'L' ? 'Laki-laki' : 'Perempuan' ?></td></tr>
@@ -101,7 +101,7 @@
                         <div class="tab-pane fade show active" id="alamat-data" role="tabpanel">
                             <table class="table table-sm">
                                 <tbody>
-                                    <tr><th colspan="2" class="bg-info px-4 pt-2"><h4 class="h4 text-white pt-1 pb-0"><i class="fas fa-grip-vertical"></i> Alamat Tempat Tinggal</h4></th></tr>
+                                    <tr><td colspan="2" class="bg-primary px-4 pt-2"><h4 class="h4 fw-bold text-white pt-1 pb-0"><i class="fas fa-grip-vertical"></i> Alamat Tempat Tinggal</h4></td></tr>
                                     <tr><th class="fw-bold" style="width: 30%;">Alamat Lengkap</th><td><?= $siswa->alamat ?? '' ?> RT <?= $siswa->rt ?? '' ?> / RW <?= $siswa->rw ?? '' ?></th></tr>
                                     <tr><th class="fw-bold"> Desa/Kecamatan/Kab/Prov</th><td><?= $siswa->desa_kelurahan ?? '' ?> / <?= $siswa->kecamatan ?? '' ?> / <?= $siswa->kabupaten ?? '' ?> / <?= $siswa->provinsi ?? '' ?></td></tr>
                                     <tr><th class="fw-bold">Telepon Seluler</th><td><?= $siswa->telepon_seluler ?? $siswa->telepon_rumah ?? '' ?></td></tr>
@@ -115,7 +115,7 @@
 
                         <div class="tab-pane fade" id="riwayat-data" role="tabpanel">
                             <table class="table table-sm">
-                                <tr><th colspan="2" class="bg-info px-4 pt-2"><h4 class="h4 text-white pt-1 pb-0"><i class="fas fa-grip-vertical"></i> Pendidikan Sebelumnya</h4></th></tr>
+                                <tr><td colspan="2" class="bg-primary px-4 pt-2"><h4 class="h4 fw-bold text-white pt-1 pb-0"><i class="fas fa-grip-vertical"></i> Pendidikan Sebelumnya</h4></td></tr>
                                 <tr>
                                     <th style="width: 30%;">Sekolah Asal</th><td><?= $siswa->sekolah_asal ?></td>
                                 </tr>
@@ -142,7 +142,7 @@
 
                         <div class="tab-pane fade" id="ortu-data" role="tabpanel">
                             <table class="table table-sm">
-                                <tr><th colspan="2" class="bg-info px-4 pt-2"><h4 class="h4 text-white pt-1 pb-0"><i class="fas fa-grip-vertical"></i> Data Ayah</h4></th></tr>
+                                <tr><td colspan="2" class="bg-primary px-4 pt-2"><h4 class="h4 fw-bold text-white pt-1 pb-0"><i class="fas fa-grip-vertical"></i> Data Ayah</h4></td></tr>
                                 <tr><th style="width: 30%;">Nama Ayah</th><td><?= $siswa->nama_ayah ?? '' ?></td></tr>
                                 <tr><th>Tempat, Tanggal Lahir Ayah</th><td><?= $siswa->tempat_lahir_ayah ? $siswa->tempat_lahir_ayah.',' : '' ?> <?= tanggal_indo($siswa->tanggal_lahir_ayah ?? '') ?></td></tr>
                                 <tr><th>Pendidikan Ayah</th><td><?= $siswa->pendidikan_ayah ?? '' ?></td></tr>
@@ -150,7 +150,7 @@
                                 <tr><th>Penghasilan Ayah</th><td><?= $siswa->penghasilan_ayah ?? '' ?></td></tr>
                                 <tr><th>No. Telepon Ayah</th><td><?= $siswa->telepon_ayah ?? '' ?></td></tr>
 
-                                <tr><th colspan="2" class="bg-info px-4 pt-2"><h4 class="h4 text-white pt-1 pb-0"><i class="fas fa-grip-vertical"></i> Data Ibu</h4></th></tr>
+                                <tr><td colspan="2" class="bg-primary px-4 pt-2"><h4 class="h4 fw-bold text-white pt-1 pb-0"><i class="fas fa-grip-vertical"></i> Data Ibu</h4></td></tr>
                                 <tr><th>Nama Ibu</th><td><?= $siswa->nama_ibu ?? '' ?></td></tr>
                                 <tr><th>Tempat, Tanggal Lahir Ibu</th><td><?= $siswa->tempat_lahir_ibu ? $siswa->tempat_lahir_ibu.', ' : '' ?> <?= tanggal_indo($siswa->tanggal_lahir_ibu ?? '') ?></td></tr>
                                 <tr><th>Pendidikan Ayah</th><td><?= $siswa->pendidikan_ibu ?? '' ?></td></tr>
@@ -161,7 +161,7 @@
                                 <?php
                                     if($siswa->nama_wali=''){
                                 ?>
-                                <tr><th colspan="2" class="bg-info px-4 pt-2"><h4 class="h4 text-white pt-1 pb-0"><i class="fas fa-grip-vertical"></i> Data Wali</h4></th></tr>
+                                <tr><td colspan="2" class="bg-primary px-4 pt-2"><h4 class="h4 fw-bold text-white pt-1 pb-0"><i class="fas fa-grip-vertical"></i> Data Wali</h4></td></tr>
                                 <tr><th>Nama Wali</th><td><?= $siswa->nama_wali ?? '' ?></td></tr>
                                 <tr><th>Tempat, Tanggal Lahir Wali</th><td><?= $siswa->tempat_lahir_wali ?? '' ?>, <?= tanggal_indo($siswa->tanggal_lahir_wali ?? '') ?></td></tr>
                                 <tr><th>Pendidikan Ayah</th><td><?= $siswa->pendidikan_wali ?? '' ?></td></tr>
@@ -172,7 +172,7 @@
                                     } else {
                                 ?>
                                 <tr>
-                                    <th colspan="2" class="py-2"></th>
+                                    <td colspan="2" class="py-2"></td>
                                 </tr>
                                 <?php
                                     }
@@ -185,7 +185,7 @@
 
                         <div class="tab-pane fade" id="hobi-data" role="tabpanel">
                             <table class="table table-sm">
-                                <tr><th colspan="2" class="bg-info px-4 pt-2"><h4 class="h4 text-white pt-1 pb-0"><i class="fas fa-grip-vertical"></i> Hobi & Cita-cita</h4></th></tr>
+                                <tr><td colspan="2" class="bg-primary px-4 pt-2"><h4 class="h4 fw-bold text-white pt-1 pb-0"><i class="fas fa-grip-vertical"></i> Hobi & Cita-cita</h4></td></tr>
                                 <tr><th style="width: 30%;"><i class="fas fa-puzzle-piece me-2"></i> Hobi</th><td><?= $siswa->hobi ?? '' ?></td></tr>
                                 <tr><th><i class="fas fa-plane-departure me-2"></i> Cita-cita</th><td><?= $siswa->cita_cita ?? '' ?></td></tr>
                             </table>
@@ -196,7 +196,7 @@
 
                         <div class="tab-pane fade" id="kesehatan-data" role="tabpanel">
                             <table class="table table-sm">
-                                <tr><th colspan="2" class="bg-info px-4 pt-2"><h4 class="h4 text-white pt-1 pb-0"><i class="fas fa-grip-vertical"></i> Kesehatan</h4></th></tr>
+                                <tr><td colspan="2" class="bg-primary px-4 pt-2"><h4 class="h4 fw-bold text-white pt-1 pb-0"><i class="fas fa-grip-vertical"></i> Kesehatan</h4></td></tr>
                                 <tr><th style="width: 30%;"><i class="fas fa-ruler-vertical me-2"></i> Tinggi Badan</th><td><?= $siswa->tinggi_badan ?? '' ?> cm</td></tr>
                                 <tr><th><i class="fas fa-weight me-2"></i> Berat Badan</th><td><?= $siswa->berat_badan ?? '' ?> kg</td></tr>
                                 <tr><th><i class="fas fa-wheelchair me-2"></i> Kebutuhan Khusus</th><td><?= $siswa->kebutuhan_khusus ?? '' ?></td></tr>
@@ -210,7 +210,7 @@
                             <?php if (!empty($kasus)): ?>
                             <table class="table table-bordered table-striped">
                                 <thead>
-                                    <tr><th colspan="2" class="bg-info px-4 pt-2"><h4 class="h4 text-white pt-1 pb-0"><i class="fas fa-grip-vertical"></i> Catatan Kasus</h4></th></tr>
+                                    <tr><td colspan="2" class="bg-primary px-4 pt-2"><h4 class="h4 fw-bold text-white pt-1 pb-0"><i class="fas fa-grip-vertical"></i> Catatan Kasus</h4></td></tr>
                                     <tr>
                                         <th><i class="fas fa-calendar-alt me-1"></i> Tanggal</th>
                                         <th><i class="fas fa-gavel me-1"></i> Jenis Kasus</th>
@@ -277,6 +277,9 @@ $(document).ready(function() {
     const modalTitle = $('#globalEditModalLabel');
     const formContainer = $('#dynamic-form-container');
     const loadingDiv = $('#modal-loading');
+
+    $('.tab-content th').addClass('bg-secondary px-3 py-2 text-light');
+    $('.tab-content td').addClass('px-3 py-2');
 
     $(document).on('click', '.btn-dynamic-edit', function() {
         const actionType = $(this).data('action');

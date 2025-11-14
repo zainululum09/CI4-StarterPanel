@@ -2025,7 +2025,7 @@ progress {
   --bs-table-bg: transparent;
   --bs-table-accent-bg: transparent;
   --bs-table-striped-color: #495057;
-  --bs-table-striped-bg: #f8f9fa;
+  --bs-table-striped-bg: #4d4d4d2f;
   --bs-table-active-color: #495057;
   --bs-table-active-bg: rgba(0, 0, 0, 0.1);
   --bs-table-hover-color: #495057;
@@ -15177,7 +15177,7 @@ a.list-group-item {
   min-height: 100vh;
   transition: margin-left 0.35s ease-in-out, left 0.35s ease-in-out,
     margin-right 0.35s ease-in-out, right 0.35s ease-in-out;
-  background: #f5f7fb;
+  background: #dcdcdc;
   flex-direction: column;
   overflow: hidden;
   border-top-left-radius: 0;

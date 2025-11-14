@@ -11,7 +11,7 @@
 
 	<title>CodeIgniter 4 Starter Panel</title>
 
-	<link rel="shortcut icon" href="<?= base_url() ?>favicon.png" />
+	<link rel="shortcut icon" href="<?= base_url('writable/uploads/image/icon.png') ?>" />
 	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
 	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
 	<link href="<?= base_url('assets/css/app.css') ?>" rel="stylesheet">
